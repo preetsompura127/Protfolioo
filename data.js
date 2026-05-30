@@ -109,7 +109,7 @@ const portfolioData = {
         },
         {
           "name": "Python(Basic)",
-          "pct": 70
+          "pct": 40
         }
       ]
     }
