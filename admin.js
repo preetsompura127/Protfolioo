@@ -75,7 +75,14 @@ function getData() {
     return JSON.parse(JSON.stringify(DEFAULT)); 
   } 
 }
-function getAdminPw() { return localStorage.getItem('adminPw') || 'admin123'; }
+function getAdminPw() { 
+  const pw = localStorage.getItem('adminPw');
+  if (!pw || pw === 'admin123') {
+    localStorage.setItem('adminPw', 'Preet@2005');
+    return 'Preet@2005';
+  }
+  return pw;
+}
 let D = getData();
 
 // Update old unsplash URLs to our custom photo path on load if found
