@@ -29,7 +29,7 @@ const portfolioData = {
       "items": [
         {
           "name": "React.js",
-          "pct": 60
+          "pct": 30
         },
         {
           "name": "HTML & CSS",
