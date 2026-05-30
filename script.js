@@ -261,25 +261,6 @@ function initPublicSite() {
       VANTA.GLOBE({ el: "#vanta-bg", mouseControls: true, touchControls: true, gyroControls: false, minHeight: 200, minWidth: 200, scale: 1, scaleMobile: 1, color: 0x6d28d9, backgroundColor: 0xf8fafc, size: 1.2 });
       vantaBg.classList.add('vanta-initialized');
     }
-  } catch(e) {}-links');
-  const cc = D.contact;
-  [
-    { href: `mailto:${cc.email}`, icon: 'mail', label: cc.email },
-    { href: `tel:${cc.phone}`, icon: 'phone', label: cc.phone },
-    { href: cc.github, icon: 'github', label: 'GitHub' },
-    { href: cc.linkedin, icon: 'linkedin', label: 'LinkedIn' }
-  ].filter(l=>l.href && l.href !== 'tel:undefined' && l.href !== 'mailto:undefined').forEach(l => {
-    const a = document.createElement('a'); a.className = 'contact-card'; a.href = l.href; a.target = '_blank';
-    a.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-feather="${l.icon}"></svg><span>${l.label}</span>`;
-    contactLinks.appendChild(a);
-  });
-
-  // Footer
-  document.getElementById('footer-text').innerHTML = D.footer || DEFAULT.footer;
-
-  // ─── VANTA ─────────────────────────────────────────────────────────────
-  try {
-    VANTA.GLOBE({ el: "#vanta-bg", mouseControls: true, touchControls: true, gyroControls: false, minHeight: 200, minWidth: 200, scale: 1, scaleMobile: 1, color: 0x6d28d9, backgroundColor: 0xf8fafc, size: 1.2 });
   } catch(e) {}
 
   // ─── FEATHER ───────────────────────────────────────────────────────────
