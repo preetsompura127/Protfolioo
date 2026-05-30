@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preet Sompura | CSE Student & Developer</title>
+  <meta name="description" content="Portfolio of Preet Sompura — B.Tech CSE (AI) student at Parul University. Full-Stack Developer & AI Enthusiast." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo" id="nav-logo-text">PS</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#education">Education</a>
+    <a href="#certifications">Certs</a>
+    <a href="#contact">Contact</a>
+    <a href="#" class="nav-resume-btn" id="nav-resume-link" style="display:none;" onclick="viewResume(event)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Resume
+    </a>
+    <a href="admin.html" class="nav-admin">⚙ Admin</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#about">About</a>
+  <a href="#skills">Skills</a>
+  <a href="#projects">Projects</a>
+  <a href="#education">Education</a>
+  <a href="#certifications">Certifications</a>
+  <a href="#contact">Contact</a>
+  <a href="#" id="mobile-resume-link" style="display:none;color:var(--accent3);font-weight:600;" onclick="viewResume(event)">📄 Resume</a>
+  <a href="admin.html" style="color:var(--accent3);font-weight:700;">⚙ Admin Panel</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div id="vanta-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot"></span> <span id="hero-badge-text">Available for Internship</span></div>
+    <div class="hero-avatar"><img id="hero-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Preet" alt="Preet Sompura" /></div>
+    <h1 class="hero-name" id="hero-name">Preet Sompura</h1>
+    <p class="hero-title" id="hero-subtitle">3rd Year B.Tech CSE (AI) · Parul University</p>
+    <div id="typewriter"></div>
+    <div class="hero-socials" id="hero-socials"></div>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary" id="hero-btn1">Work With Me</a>
+      <a href="#projects" class="btn-outline" id="hero-btn2">View Projects</a>
+      <a href="#" class="btn-resume" id="hero-resume-btn" style="display:none;" onclick="viewResume(event)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        View Resume
+      </a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    Scroll
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="about-img-wrap reveal">
+        <img id="about-img" src="png/WhatsApp Image 2026-05-12 at 8.48.22 PM (1).jpeg" alt="Preet coding" />
+      </div>
+      <div class="reveal">
+        <div class="section-tag">About Me</div>
+        <h2 class="section-title">Who Am I?</h2>
+        <div class="divider"></div>
+        <p class="about-bio" id="about-bio"></p>
+        <div class="about-info" id="about-info"></div>
+        <div class="about-resume-wrap" id="about-resume-wrap" style="display:none;">
+          <a href="#" class="btn-resume-view" id="about-resume-view" onclick="viewResume(event)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            View Resume
+          </a>
+          <a href="#" class="btn-resume-dl" id="about-resume-dl" onclick="downloadResume(event)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Resume
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag">Technical Skills</div>
+      <h2 class="section-title">My Tech Stack</h2>
+      <div class="divider"></div>
+      <p class="section-subtitle">Technologies I work with day-to-day.</p>
+    </div>
+    <div class="skills-grid" id="skills-grid"></div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag">Portfolio</div>
+      <h2 class="section-title">Featured Projects</h2>
+      <div class="divider"></div>
+      <p class="section-subtitle">Things I've built that I'm proud of.</p>
+    </div>
+    <div class="projects-grid" id="projects-grid"></div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag">Education</div>
+      <h2 class="section-title">Academic Journey</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="edu-timeline" id="edu-timeline"></div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag">Certifications</div>
+      <h2 class="section-title">Credentials & Courses</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="cert-grid" id="cert-grid"></div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section id="achievements">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag">Achievements</div>
+      <h2 class="section-title">Milestones</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="achieve-list" id="achieve-list"></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag">Contact</div>
+      <h2 class="section-title" style="text-align:center;">Let's Connect</h2>
+      <div class="divider" style="margin:0 auto 1rem;"></div>
+    </div>
+    <div class="contact-wrap reveal">
+      <p id="contact-desc">I'm open to internship opportunities, collaborations, and exciting projects. Let's build something amazing together!</p>
+      <div class="contact-grid" id="contact-links"></div>
+      <a href="#" class="btn-primary" id="contact-email-btn">Send an Email</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p id="footer-text">© 2026 <strong>Preet Sompura</strong>. Crafted with passion & a lot of coffee ☕</p>
+</footer>
+
+<script src="script.js" defer></script>
+</body>
+</html>

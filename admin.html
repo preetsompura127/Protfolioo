@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="admin-page">
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">⚙ Admin Panel</div>
+    <div class="login-sub">Portfolio Control Center · Preet Sompura</div>
+    <label class="login-label" for="pw-input">Password</label>
+    <input class="login-input" type="password" id="pw-input" placeholder="Enter admin password…" autocomplete="current-password" />
+    <button class="login-btn" onclick="doLogin()">🔐 Login to Admin</button>
+    <div class="login-err" id="login-err">❌ Wrong password. Try again.</div>
+    <p style="text-align:center;margin-top:1.2rem;font-size:0.75rem;color:var(--text3)">Default password: <strong style="color:var(--accent3)">admin123</strong></p>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">⚙ Admin Panel</div>
+      <div class="sidebar-sub">Portfolio Manager</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Overview</div>
+      <div class="nav-item active" onclick="switchPanel('dashboard',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-section-title">Sections</div>
+      <div class="nav-item" onclick="switchPanel('hero',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Hero
+      </div>
+      <div class="nav-item" onclick="switchPanel('about',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        About
+      </div>
+      <div class="nav-item" onclick="switchPanel('skills',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Skills
+      </div>
+      <div class="nav-item" onclick="switchPanel('projects',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        Projects
+      </div>
+      <div class="nav-item" onclick="switchPanel('education',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        Education
+      </div>
+      <div class="nav-item" onclick="switchPanel('certifications',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        Certifications
+      </div>
+      <div class="nav-item" onclick="switchPanel('achievements',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Achievements
+      </div>
+      <div class="nav-item" onclick="switchPanel('contact',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.22 1.18 2 2 0 012.22 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+        Contact
+      </div>
+      <div class="nav-item" onclick="switchPanel('resume',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Resume
+      </div>
+      <div class="nav-section-title">Settings</div>
+      <div class="nav-item" onclick="switchPanel('settings',this)">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-btn btn-view" onclick="window.open('index.html','_blank')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        View Portfolio
+      </button>
+      <button class="sidebar-btn btn-logout" onclick="doLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-sub">Portfolio Admin · Preet Sompura</div>
+      </div>
+      <div class="topbar-right">
+        <button class="save-btn" onclick="saveAll()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save All
+        </button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="preview-bar">
+        <span>✅ Your portfolio is live — changes save to localStorage instantly</span>
+        <a href="index.html" target="_blank">🔗 Open Portfolio</a>
+      </div>
+      <div class="dash-grid" id="dash-stats"></div>
+      <div class="card">
+        <div class="card-title">🚀 Quick Edit</div>
+        <div class="card-desc">Click any section in the sidebar to start editing. Hit "Save All" when done.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.8rem;margin-top:1rem;">
+          <button class="add-btn" onclick="switchPanel('hero',document.querySelector('[onclick*=hero]'))">Edit Hero</button>
+          <button class="add-btn" onclick="switchPanel('skills',document.querySelectorAll('.nav-item')[3])">Edit Skills</button>
+          <button class="add-btn" onclick="switchPanel('projects',document.querySelectorAll('.nav-item')[4])">Edit Projects</button>
+          <button class="add-btn" onclick="switchPanel('contact',document.querySelectorAll('.nav-item')[7])">Edit Contact</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <div class="panel" id="panel-hero">
+      <div class="card">
+        <div class="card-title">🏠 Hero Section</div>
+        <div class="card-desc">The first thing visitors see. Make it count!</div>
+        <div class="field-row">
+          <div class="field"><label>Full Name</label><input type="text" id="h-name" /></div>
+          <div class="field"><label>Badge Text</label><input type="text" id="h-badge" /></div>
+        </div>
+        <div class="field"><label>Subtitle</label><input type="text" id="h-subtitle" /></div>
+        <div class="field">
+          <label>Avatar Image URL</label>
+          <div style="display:flex;gap:1rem;align-items:center;">
+            <input type="text" id="h-avatar" placeholder="https://..." style="flex:1;" />
+            <label for="avatar-upload" class="save-btn" style="width:auto;margin:0;cursor:pointer;white-space:nowrap;background:linear-gradient(135deg, var(--cyan), var(--blue));box-shadow:0 4px 16px rgba(6,182,212,0.3)">
+              📁 Upload Avatar PNG
+            </label>
+            <input type="file" id="avatar-upload" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this)" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Button 1 Label</label><input type="text" id="h-btn1l" /></div>
+          <div class="field"><label>Button 1 Link</label><input type="text" id="h-btn1k" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Button 2 Label</label><input type="text" id="h-btn2l" /></div>
+          <div class="field"><label>Button 2 Link</label><input type="text" id="h-btn2k" /></div>
+        </div>
+        <div class="field">
+          <label>Typewriter Words (comma separated)</label>
+          <input type="text" id="h-typewords" placeholder="Full-Stack Developer, AI Enthusiast, ..." />
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="panel" id="panel-about">
+      <div class="card">
+        <div class="card-title">👤 About Section</div>
+        <div class="card-desc">Your bio and contact details.</div>
+        <div class="field">
+          <label>About Image URL</label>
+          <div style="display:flex;gap:1rem;align-items:center;">
+            <input type="text" id="a-img" style="flex:1;" />
+            <label for="about-upload" class="save-btn" style="width:auto;margin:0;cursor:pointer;white-space:nowrap;background:linear-gradient(135deg, var(--cyan), var(--blue));box-shadow:0 4px 16px rgba(6,182,212,0.3)">
+              📁 Upload Photo PNG
+            </label>
+            <input type="file" id="about-upload" accept="image/*" style="display:none;" onchange="handleAboutUpload(this)" />
+          </div>
+        </div>
+        <div class="field"><label>Bio / Summary</label><textarea id="a-bio" rows="5"></textarea></div>
+        <div class="field-row">
+          <div class="field"><label>Email</label><input type="email" id="a-email" /></div>
+          <div class="field"><label>Phone</label><input type="text" id="a-phone" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>GitHub URL</label><input type="text" id="a-github" /></div>
+          <div class="field"><label>Location</label><input type="text" id="a-loc" /></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="panel" id="panel-skills">
+      <div class="card">
+        <div class="card-title">⚡ Skills</div>
+        <div class="card-desc">Manage your skill categories and proficiency levels.</div>
+        <div id="skills-editor"></div>
+        <button class="add-btn" onclick="addSkillCategory()">+ Add Category</button>
+      </div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="panel" id="panel-projects">
+      <div class="card">
+        <div class="card-title">🚀 Projects</div>
+        <div class="card-desc">Add, edit, or remove portfolio projects.</div>
+        <div id="projects-editor"></div>
+        <button class="add-btn" onclick="addProject()">+ Add Project</button>
+      </div>
+    </div>
+
+    <!-- EDUCATION -->
+    <div class="panel" id="panel-education">
+      <div class="card">
+        <div class="card-title">🎓 Education</div>
+        <div class="card-desc">Your academic background.</div>
+        <div id="edu-editor"></div>
+        <button class="add-btn" onclick="addEdu()">+ Add Education</button>
+      </div>
+    </div>
+
+    <!-- CERTIFICATIONS -->
+    <div class="panel" id="panel-certifications">
+      <div class="card">
+        <div class="card-title">🏅 Certifications</div>
+        <div class="card-desc">Your credentials and completed courses.</div>
+        <div id="cert-editor"></div>
+        <button class="add-btn" onclick="addCert()">+ Add Certification</button>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="panel" id="panel-achievements">
+      <div class="card">
+        <div class="card-title">⭐ Achievements</div>
+        <div class="card-desc">Honors, awards, and milestones.</div>
+        <div id="achieve-editor"></div>
+        <button class="add-btn" onclick="addAchieve()">+ Add Achievement</button>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="panel" id="panel-contact">
+      <div class="card">
+        <div class="card-title">📬 Contact Links</div>
+        <div class="card-desc">Your social and contact information.</div>
+        <div class="field-row">
+          <div class="field"><label>Email</label><input type="email" id="c-email" /></div>
+          <div class="field"><label>Phone</label><input type="text" id="c-phone" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>GitHub URL</label><input type="text" id="c-github" /></div>
+          <div class="field"><label>LinkedIn URL</label><input type="text" id="c-linkedin" /></div>
+        </div>
+        <div class="field"><label>LeetCode URL</label><input type="text" id="c-leetcode" /></div>
+        <div class="field"><label>Contact Section Description</label><textarea id="c-desc" rows="3"></textarea></div>
+        <div class="field"><label>Footer Text</label><input type="text" id="c-footer" /></div>
+      </div>
+    </div>
+
+    <!-- RESUME -->
+    <div class="panel" id="panel-resume">
+      <div class="card">
+        <div class="card-title">📄 Resume Manager</div>
+        <div class="card-desc">Upload your resume PDF or link an external URL. Visitors can view and download it from your portfolio.</div>
+
+        <!-- Source Selector -->
+        <div class="field">
+          <label>Resume Source</label>
+          <div class="resume-source-toggle" id="resume-source-toggle">
+            <button class="source-btn active" id="src-btn-upload" onclick="setResumeSource('upload')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload PDF File
+            </button>
+            <button class="source-btn" id="src-btn-url" onclick="setResumeSource('url')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              External URL
+            </button>
+          </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div id="resume-upload-section">
+          <div class="resume-dropzone" id="resume-dropzone" onclick="document.getElementById('resume-file-input').click()" ondragover="handleResumeDragOver(event)" ondragleave="handleResumeDragLeave(event)" ondrop="handleResumeDrop(event)">
+            <div class="dropzone-icon">📄</div>
+            <div class="dropzone-title">Drop your PDF here or click to browse</div>
+            <div class="dropzone-sub">Max file size: 3MB · PDF only</div>
+            <input type="file" id="resume-file-input" accept="application/pdf,.pdf" style="display:none;" onchange="handleResumeUpload(this)" />
+          </div>
+          <div class="resume-file-info" id="resume-file-info" style="display:none;">
+            <div class="resume-file-icon">📄</div>
+            <div class="resume-file-details">
+              <div class="resume-file-name" id="resume-file-name">resume.pdf</div>
+              <div class="resume-file-size" id="resume-file-size">0 KB</div>
+            </div>
+            <div class="resume-file-actions">
+              <button class="sidebar-btn btn-view" onclick="previewResume()" style="width:auto;padding:0.5rem 1rem;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View
+              </button>
+              <button class="del-btn" onclick="removeResume()" style="padding:0.5rem 1rem;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- URL Section -->
+        <div id="resume-url-section" style="display:none;">
+          <div class="field">
+            <label>Resume URL (Google Drive, Dropbox, Direct PDF link…)</label>
+            <input type="url" id="resume-url-input" placeholder="https://drive.google.com/file/d/..." />
+          </div>
+          <div style="display:flex;gap:0.8rem;margin-top:0.5rem;">
+            <button class="sidebar-btn btn-view" onclick="previewResumeUrl()" style="width:auto;padding:0.5rem 1.2rem;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Test Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Status Banner -->
+        <div class="resume-status" id="resume-status" style="display:none;"></div>
+
+        <!-- Save Button -->
+        <div style="margin-top:1.5rem;">
+          <button class="save-btn" style="width:auto;" onclick="saveResume()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Resume
+          </button>
+        </div>
+      </div>
+
+      <!-- Info Card -->
+      <div class="card">
+        <div class="card-title">ℹ️ How Resume Works</div>
+        <div class="card-desc">Once saved, your portfolio will show <strong>View Resume</strong> and <strong>Download Resume</strong> buttons in the Hero section and About section. Visitors can open it directly in their browser or download it.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-top:1rem;">
+          <div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:1rem;">
+            <div style="font-size:0.8rem;font-weight:700;color:var(--accent3);margin-bottom:0.3rem;">📤 Upload PDF</div>
+            <div style="font-size:0.78rem;color:var(--text3);line-height:1.5;">PDF is stored locally in your browser. Works offline. Max 3MB.</div>
+          </div>
+          <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:10px;padding:1rem;">
+            <div style="font-size:0.8rem;font-weight:700;color:var(--cyan);margin-bottom:0.3rem;">🔗 External URL</div>
+            <div style="font-size:0.78rem;color:var(--text3);line-height:1.5;">Link to Google Drive or any public PDF. No size limit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel" id="panel-settings">
+      <div class="card">
+        <div class="card-title">🔐 Change Password</div>
+        <div class="card-desc">Update your admin panel password.</div>
+        <div class="field"><label>Current Password</label><input type="password" id="s-current" /></div>
+        <div class="field-row">
+          <div class="field"><label>New Password</label><input type="password" id="s-new" /></div>
+          <div class="field"><label>Confirm New Password</label><input type="password" id="s-confirm" /></div>
+        </div>
+        <button class="save-btn" style="width:auto;" onclick="changePassword()">Update Password</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🗑 Data Management</div>
+        <div class="card-desc">Reset all portfolio data to defaults.</div>
+        <button onclick="resetData()" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:var(--red);border-radius:10px;padding:0.7rem 1.4rem;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;">⚠ Reset to Defaults</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <span class="toast-icon" id="toast-icon">✅</span>
+  <div><div class="toast-msg" id="toast-msg"></div><div class="toast-sub" id="toast-sub"></div></div>
+</div>
+
+<script src="script.js" defer></script>
+</body>
+</html>
