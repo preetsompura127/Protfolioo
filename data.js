@@ -1,4 +1,4 @@
-{
+const portfolioData = {
   "hero": {
     "name": "Preet Sompura",
     "subtitle": "3rd Year B.Tech CSE (AI) · Parul University",
@@ -167,4 +167,4 @@
     "pdfData": ""
   },
   "footer": "&copy; 2026 <strong>Preet Sompura</strong>. Crafted with passion & a lot of coffee &#9749;"
-}
+};

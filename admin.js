@@ -70,9 +70,9 @@ const DEFAULT = {
 // ─── STATE ────────────────────────────────────────────────────────────────
 function getData() { 
   try { 
-    return JSON.parse(localStorage.getItem('portfolioData')) || JSON.parse(JSON.stringify(DEFAULT)); 
+    return JSON.parse(localStorage.getItem('portfolioData')) || (typeof portfolioData !== 'undefined' ? portfolioData : JSON.parse(JSON.stringify(DEFAULT))); 
   } catch { 
-    return JSON.parse(JSON.stringify(DEFAULT)); 
+    return typeof portfolioData !== 'undefined' ? portfolioData : JSON.parse(JSON.stringify(DEFAULT)); 
   } 
 }
 function getAdminPw() { 
@@ -100,7 +100,7 @@ function doLogin() {
     sessionStorage.setItem('adminLoggedIn', 'true'); // Save session state
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-app').classList.add('visible');
-    syncAdminWithBackend();
+    populateAll();
     toast('success', '✅ Welcome back!', 'Admin panel unlocked');
   } else {
     document.getElementById('login-err').style.display = 'block';
@@ -311,22 +311,17 @@ async function saveAll() {
   // Persist locally as fallback
   localStorage.setItem('portfolioData', JSON.stringify(D));
   
-  // Persist to server backend database
-  const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
-  try {
-    const res = await fetch(`${API_BASE}/api/portfolio`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(D)
-    });
-    if (res.ok) {
-      toast('success', '✅ Saved to Database!', 'Portfolio data updated in server DB.');
-    } else {
-      toast('error', '⚠️ Saved Locally Only', 'Backend server returned an error.');
-    }
-  } catch (err) {
-    toast('success', '✅ Saved Successfully!', 'Portfolio data updated in localStorage (Offline).');
-  }
+  // Trigger download of updated data.js file to store statically in local files
+  const jsContent = `const portfolioData = ${JSON.stringify(D, null, 2)};`;
+  const blob = new Blob([jsContent], { type: 'application/javascript;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.js';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  toast('success', '💾 Saved & Downloaded data.js!', 'Replace the old data.js file in your portfolio folder with this newly downloaded file to save permanently.');
   populateDash();
 }
 
@@ -397,44 +392,21 @@ function handleResumeUpload(input) {
   if (input.files && input.files[0]) processResumeFile(input.files[0]);
 }
 
-async function uploadFileToServer(file) {
-  const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
-  const formData = new FormData();
-  formData.append('file', file);
-  const response = await fetch(`${API_BASE}/api/upload`, {
-    method: 'POST',
-    body: formData
-  });
-  if (!response.ok) {
-    throw new Error('Upload failed');
-  }
-  return await response.json();
-}
-
-async function processResumeFile(file) {
+function processResumeFile(file) {
   if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
     toast('error', '❌ Invalid File Type', 'Only PDF files are supported');
     return;
   }
   
-  toast('success', '⏳ Uploading resume PDF...', 'Please wait...');
-  try {
-    const data = await uploadFileToServer(file);
-    _currentResumePdfData = data.fileUrl;
+  toast('success', '⏳ Loading PDF...', 'Please wait...');
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    _currentResumePdfData = e.target.result;
     _currentResumePdfName = file.name;
-    showFileInfo(file.name, data.fileUrl, file.size);
-    toast('success', '📄 PDF Uploaded!', `"${file.name}" ready. Click "Save Resume" to apply.`);
-  } catch (err) {
-    // Fallback to local Reader
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      _currentResumePdfData = e.target.result;
-      _currentResumePdfName = file.name;
-      showFileInfo(file.name, e.target.result, file.size);
-      toast('success', '📄 PDF Loaded (Offline)!', `"${file.name}" ready. Click "Save Resume" to apply.`);
-    };
-    reader.readAsDataURL(file);
-  }
+    showFileInfo(file.name, e.target.result, file.size);
+    toast('success', '📄 PDF Loaded!', `"${file.name}" ready. Click "Save Resume" to apply.`);
+  };
+  reader.readAsDataURL(file);
 }
 
 function showFileInfo(name, data, sizeBytes) {
@@ -451,7 +423,7 @@ function showFileInfo(name, data, sizeBytes) {
       const approx = Math.round(data.length * 0.75);
       label = approx >= 1024*1024 ? (approx/1024/1024).toFixed(2)+' MB' : Math.round(approx/1024)+' KB';
     } else {
-      label = 'Saved on Server';
+      label = 'Local Static File';
     }
     document.getElementById('resume-file-size').textContent = label;
   }
@@ -563,76 +535,35 @@ function toast(type, msg, sub) {
 }
 
 // ─── IMAGE UPLOADS ────────────────────────────────────────────────────────
-async function handleAvatarUpload(input) {
+function handleAvatarUpload(input) {
   if (input.files && input.files[0]) {
     const file = input.files[0];
-    toast('success', '⏳ Uploading avatar...', 'Please wait...');
-    try {
-      const data = await uploadFileToServer(file);
-      document.getElementById('h-avatar').value = data.fileUrl;
-      toast('success', '📁 Avatar Uploaded!', 'Click "Save All" to save your profile picture');
-    } catch (e) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('h-avatar').value = e.target.result;
-        toast('success', '📁 Avatar Loaded (Offline)!', 'Click "Save All" to save (localStorage)');
-      };
-      reader.readAsDataURL(file);
-    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('h-avatar').value = e.target.result;
+      toast('success', '📁 Avatar Loaded!', 'Click "Save All" to save your profile picture');
+    };
+    reader.readAsDataURL(file);
   }
 }
 
-async function handleAboutUpload(input) {
+function handleAboutUpload(input) {
   if (input.files && input.files[0]) {
     const file = input.files[0];
-    toast('success', '⏳ Uploading photo...', 'Please wait...');
-    try {
-      const data = await uploadFileToServer(file);
-      document.getElementById('a-img').value = data.fileUrl;
-      toast('success', '📁 Photo Uploaded!', 'Click "Save All" to save your About picture');
-    } catch (e) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('a-img').value = e.target.result;
-        toast('success', '📁 Photo Loaded (Offline)!', 'Click "Save All" to save (localStorage)');
-      };
-      reader.readAsDataURL(file);
-    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('a-img').value = e.target.result;
+      toast('success', '📁 Photo Loaded!', 'Click "Save All" to save your About picture');
+    };
+    reader.readAsDataURL(file);
   }
 }
 
 // ─── DOM CONTENT LOADED (Session persistence check) ──────────────────────
-async function syncAdminWithBackend() {
-  const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
-  try {
-    const res = await fetch(`${API_BASE}/api/portfolio`);
-    if (res.ok) {
-      const data = await res.json();
-      D = data;
-      // Resolve uploaded relative URLs to full URL if opened via file:// protocol
-      if (window.location.protocol === 'file:') {
-        if (D.hero && D.hero.avatarUrl && D.hero.avatarUrl.startsWith('/uploads/')) {
-          D.hero.avatarUrl = 'http://localhost:3000' + D.hero.avatarUrl;
-        }
-        if (D.about && D.about.imgUrl && D.about.imgUrl.startsWith('/uploads/')) {
-          D.about.imgUrl = 'http://localhost:3000' + D.about.imgUrl;
-        }
-        if (D.resume && D.resume.pdfData && D.resume.pdfData.startsWith('/uploads/')) {
-          D.resume.pdfData = 'http://localhost:3000' + D.resume.pdfData;
-        }
-      }
-      localStorage.setItem('portfolioData', JSON.stringify(D));
-    }
-  } catch (err) {
-    console.log("Local backend server offline. Using localStorage fallback.");
-  }
-  populateAll();
-}
-
 window.addEventListener('DOMContentLoaded', () => {
   if (sessionStorage.getItem('adminLoggedIn') === 'true') {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-app').classList.add('visible');
-    syncAdminWithBackend();
+    populateAll();
   }
 });

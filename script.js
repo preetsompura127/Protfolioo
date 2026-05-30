@@ -69,9 +69,9 @@ const DEFAULT = {
 
 function getData() {
   try {
-    return JSON.parse(localStorage.getItem('portfolioData')) || JSON.parse(JSON.stringify(DEFAULT));
+    return JSON.parse(localStorage.getItem('portfolioData')) || (typeof portfolioData !== 'undefined' ? portfolioData : JSON.parse(JSON.stringify(DEFAULT)));
   } catch {
-    return JSON.parse(JSON.stringify(DEFAULT));
+    return typeof portfolioData !== 'undefined' ? portfolioData : JSON.parse(JSON.stringify(DEFAULT));
   }
 }
 
@@ -374,34 +374,3 @@ function initPublicSite() {
 initPublicSite();
 
 // Admin Panel logic has been fully moved to its own dedicated file: admin.js
-
-// Asynchronously fetch latest database portfolio data from backend if running under Node.js server!
-async function syncWithBackend() {
-  const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
-  try {
-    const res = await fetch(`${API_BASE}/api/portfolio`);
-    if (res.ok) {
-      const data = await res.json();
-      D = data;
-      // Resolve uploaded relative URLs to full URL if opened via file:// protocol
-      if (window.location.protocol === 'file:') {
-        if (D.hero && D.hero.avatarUrl && D.hero.avatarUrl.startsWith('/uploads/')) {
-          D.hero.avatarUrl = 'http://localhost:3000' + D.hero.avatarUrl;
-        }
-        if (D.about && D.about.imgUrl && D.about.imgUrl.startsWith('/uploads/')) {
-          D.about.imgUrl = 'http://localhost:3000' + D.about.imgUrl;
-        }
-        if (D.resume && D.resume.pdfData && D.resume.pdfData.startsWith('/uploads/')) {
-          D.resume.pdfData = 'http://localhost:3000' + D.resume.pdfData;
-        }
-      }
-      // Sync cache to localStorage for offline robustness
-      localStorage.setItem('portfolioData', JSON.stringify(D));
-      // Re-run init to render live DB data
-      initPublicSite();
-    }
-  } catch (err) {
-    console.log("Local backend server not detected. Running in standalone static/localStorage mode.");
-  }
-}
-syncWithBackend();
