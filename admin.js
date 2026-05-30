@@ -100,7 +100,7 @@ function doLogin() {
     sessionStorage.setItem('adminLoggedIn', 'true'); // Save session state
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-app').classList.add('visible');
-    populateAll();
+    syncAdminWithBackend();
     toast('success', '✅ Welcome back!', 'Admin panel unlocked');
   } else {
     document.getElementById('login-err').style.display = 'block';
@@ -282,7 +282,7 @@ function populateContact() {
 }
 
 // ─── SAVE ─────────────────────────────────────────────────────────────────
-function saveAll() {
+async function saveAll() {
   // Hero
   D.hero.name = v('h-name');
   D.hero.badge = v('h-badge');
@@ -308,10 +308,25 @@ function saveAll() {
   D.contact.leetcode = v('c-leetcode');
   D.contact.desc = v('c-desc');
   D.footer = v('c-footer');
-  // Persist
+  // Persist locally as fallback
   localStorage.setItem('portfolioData', JSON.stringify(D));
+  
+  // Persist to server backend database
+  try {
+    const res = await fetch('/api/portfolio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(D)
+    });
+    if (res.ok) {
+      toast('success', '✅ Saved to Database!', 'Portfolio data updated in server DB.');
+    } else {
+      toast('error', '⚠️ Saved Locally Only', 'Backend server returned an error.');
+    }
+  } catch (err) {
+    toast('success', '✅ Saved Successfully!', 'Portfolio data updated in localStorage (Offline).');
+  }
   populateDash();
-  toast('success', '✅ Saved Successfully!', 'Portfolio data updated. Refresh portfolio to see changes.');
 }
 
 // ─── RESUME ────────────────────────────────────────────────────────────────
@@ -381,24 +396,43 @@ function handleResumeUpload(input) {
   if (input.files && input.files[0]) processResumeFile(input.files[0]);
 }
 
-function processResumeFile(file) {
+async function uploadFileToServer(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData
+  });
+  if (!response.ok) {
+    throw new Error('Upload failed');
+  }
+  return await response.json();
+}
+
+async function processResumeFile(file) {
   if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-    toast('error', '\u274c Invalid File Type', 'Only PDF files are supported');
+    toast('error', '❌ Invalid File Type', 'Only PDF files are supported');
     return;
   }
-  const maxBytes = 3 * 1024 * 1024;
-  if (file.size > maxBytes) {
-    toast('error', '\u274c File Too Large', `Max 3MB. Your file is ${(file.size/1024/1024).toFixed(1)}MB`);
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    _currentResumePdfData = e.target.result;
+  
+  toast('success', '⏳ Uploading resume PDF...', 'Please wait...');
+  try {
+    const data = await uploadFileToServer(file);
+    _currentResumePdfData = data.fileUrl;
     _currentResumePdfName = file.name;
-    showFileInfo(file.name, e.target.result, file.size);
-    toast('success', '\ud83d\udcc4 PDF Loaded!', `"${file.name}" ready. Click "Save Resume" to apply.`);
-  };
-  reader.readAsDataURL(file);
+    showFileInfo(file.name, data.fileUrl, file.size);
+    toast('success', '📄 PDF Uploaded!', `"${file.name}" ready. Click "Save Resume" to apply.`);
+  } catch (err) {
+    // Fallback to local Reader
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      _currentResumePdfData = e.target.result;
+      _currentResumePdfName = file.name;
+      showFileInfo(file.name, e.target.result, file.size);
+      toast('success', '📄 PDF Loaded (Offline)!', `"${file.name}" ready. Click "Save Resume" to apply.`);
+    };
+    reader.readAsDataURL(file);
+  }
 }
 
 function showFileInfo(name, data, sizeBytes) {
@@ -411,9 +445,11 @@ function showFileInfo(name, data, sizeBytes) {
     let label = '';
     if (sizeBytes) {
       label = sizeBytes >= 1024*1024 ? (sizeBytes/1024/1024).toFixed(2)+' MB' : Math.round(sizeBytes/1024)+' KB';
-    } else if (data) {
+    } else if (data && data.startsWith('data:')) {
       const approx = Math.round(data.length * 0.75);
       label = approx >= 1024*1024 ? (approx/1024/1024).toFixed(2)+' MB' : Math.round(approx/1024)+' KB';
+    } else {
+      label = 'Saved on Server';
     }
     document.getElementById('resume-file-size').textContent = label;
   }
@@ -434,9 +470,13 @@ function removeResume() {
 
 function previewResume() {
   const data = _currentResumePdfData || (D.resume && D.resume.pdfData);
-  if (!data) { toast('error', '\u274c No PDF', 'No PDF file loaded'); return; }
-  const blob = dataURLToBlob(data);
-  window.open(URL.createObjectURL(blob), '_blank');
+  if (!data) { toast('error', '❌ No PDF', 'No PDF file loaded'); return; }
+  if (data.startsWith('/uploads/') || data.startsWith('http') || data.startsWith('data:') === false) {
+    window.open(data, '_blank');
+  } else {
+    const blob = dataURLToBlob(data);
+    window.open(URL.createObjectURL(blob), '_blank');
+  }
 }
 
 function previewResumeUrl() {
@@ -521,35 +561,63 @@ function toast(type, msg, sub) {
 }
 
 // ─── IMAGE UPLOADS ────────────────────────────────────────────────────────
-function handleAvatarUpload(input) {
+async function handleAvatarUpload(input) {
   if (input.files && input.files[0]) {
     const file = input.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById('h-avatar').value = e.target.result;
+    toast('success', '⏳ Uploading avatar...', 'Please wait...');
+    try {
+      const data = await uploadFileToServer(file);
+      document.getElementById('h-avatar').value = data.fileUrl;
       toast('success', '📁 Avatar Uploaded!', 'Click "Save All" to save your profile picture');
-    };
-    reader.readAsDataURL(file);
+    } catch (e) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('h-avatar').value = e.target.result;
+        toast('success', '📁 Avatar Loaded (Offline)!', 'Click "Save All" to save (localStorage)');
+      };
+      reader.readAsDataURL(file);
+    }
   }
 }
 
-function handleAboutUpload(input) {
+async function handleAboutUpload(input) {
   if (input.files && input.files[0]) {
     const file = input.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById('a-img').value = e.target.result;
+    toast('success', '⏳ Uploading photo...', 'Please wait...');
+    try {
+      const data = await uploadFileToServer(file);
+      document.getElementById('a-img').value = data.fileUrl;
       toast('success', '📁 Photo Uploaded!', 'Click "Save All" to save your About picture');
-    };
-    reader.readAsDataURL(file);
+    } catch (e) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('a-img').value = e.target.result;
+        toast('success', '📁 Photo Loaded (Offline)!', 'Click "Save All" to save (localStorage)');
+      };
+      reader.readAsDataURL(file);
+    }
   }
 }
 
 // ─── DOM CONTENT LOADED (Session persistence check) ──────────────────────
+async function syncAdminWithBackend() {
+  try {
+    const res = await fetch('/api/portfolio');
+    if (res.ok) {
+      const data = await res.json();
+      D = data;
+      localStorage.setItem('portfolioData', JSON.stringify(D));
+    }
+  } catch (err) {
+    console.log("Local backend server offline. Using localStorage fallback.");
+  }
+  populateAll();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   if (sessionStorage.getItem('adminLoggedIn') === 'true') {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-app').classList.add('visible');
-    populateAll();
+    syncAdminWithBackend();
   }
 });

@@ -114,104 +114,154 @@ function initPublicSite() {
     const words = D.hero.typewords || [];
     let wi = 0, ci = 0, del = false;
     const el = document.getElementById('typewriter');
-    function tick() {
-      const w = words[wi] || '';
-      if (!del) { ci++; el.textContent = w.slice(0,ci); if (ci === w.length) { del = true; setTimeout(tick, 1800); return; } }
-      else { ci--; el.textContent = w.slice(0,ci); if (ci === 0) { del = false; wi = (wi+1) % words.length; } }
-      setTimeout(tick, del ? 50 : 80);
+    if (el) {
+      el.textContent = '';
+      function tick() {
+        const w = words[wi] || '';
+        if (!del) { ci++; el.textContent = w.slice(0,ci); if (ci === w.length) { del = true; setTimeout(tick, 1800); return; } }
+        else { ci--; el.textContent = w.slice(0,ci); if (ci === 0) { del = false; wi = (wi+1) % words.length; } }
+        setTimeout(tick, del ? 50 : 80);
+      }
+      if (words.length) tick();
     }
-    if (words.length) tick();
   })();
 
   // Socials
   const socialsEl = document.getElementById('hero-socials');
-  const c = D.contact;
-  [
-    { href: c.github, icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>`, title: 'GitHub' },
-    { href: c.linkedin, icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`, title: 'LinkedIn' },
-    { href: `mailto:${c.email}`, icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`, title: 'Email' }
-  ].forEach(s => {
-    if (!s.href) return;
-    const a = document.createElement('a'); a.className = 'social-icon';
-    a.href = s.href; a.title = s.title; a.target = '_blank';
-    a.innerHTML = s.icon; socialsEl.appendChild(a);
-  });
+  if (socialsEl) {
+    socialsEl.innerHTML = '';
+    const c = D.contact;
+    [
+      { href: c.github, icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>`, title: 'GitHub' },
+      { href: c.linkedin, icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`, title: 'LinkedIn' },
+      { href: `mailto:${c.email}`, icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`, title: 'Email' }
+    ].forEach(s => {
+      if (!s.href) return;
+      const a = document.createElement('a'); a.className = 'social-icon';
+      a.href = s.href; a.title = s.title; a.target = '_blank';
+      a.innerHTML = s.icon; socialsEl.appendChild(a);
+    });
+  }
 
   // ─── ABOUT ──────────────────────────────────────────────────────────────
   document.getElementById('about-img').src = D.about.imgUrl;
   document.getElementById('about-bio').textContent = D.about.bio;
   document.getElementById('contact-email-btn').href = `mailto:${D.contact.email}`;
 
-  const infoItems = [
-    { icon: 'mail', label: D.about.email, href: `mailto:${D.about.email}` },
-    { icon: 'phone', label: D.about.phone, href: `tel:${D.about.phone}` },
-    { icon: 'github', label: D.about.github, href: `https://${D.about.github}` },
-    { icon: 'map-pin', label: D.about.location }
-  ];
   const infoEl = document.getElementById('about-info');
-  infoItems.forEach(item => {
-    const d = document.createElement('div'); d.className = 'info-item';
-    d.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" class="icon" data-feather="${item.icon}"></svg>
-      ${item.href ? `<a href="${item.href}" target="_blank">${item.label}</a>` : `<span>${item.label}</span>`}`;
-    infoEl.appendChild(d);
-  });
+  if (infoEl) {
+    infoEl.innerHTML = '';
+    const infoItems = [
+      { icon: 'mail', label: D.about.email, href: `mailto:${D.about.email}` },
+      { icon: 'phone', label: D.about.phone, href: `tel:${D.about.phone}` },
+      { icon: 'github', label: D.about.github, href: `https://${D.about.github}` },
+      { icon: 'map-pin', label: D.about.location }
+    ];
+    infoItems.forEach(item => {
+      const d = document.createElement('div'); d.className = 'info-item';
+      d.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" class="icon" data-feather="${item.icon}"></svg>
+        ${item.href ? `<a href="${item.href}" target="_blank">${item.label}</a>` : `<span>${item.label}</span>`}`;
+      infoEl.appendChild(d);
+    });
+  }
 
   // ─── SKILLS ─────────────────────────────────────────────────────────────
   const skillsGrid = document.getElementById('skills-grid');
-  D.skills.forEach(cat => {
-    const card = document.createElement('div'); card.className = 'skill-card reveal';
-    card.innerHTML = `<div class="skill-cat">${cat.category}</div>` +
-      cat.items.map(s => `<div class="skill-item">
-        <div class="skill-header"><span class="skill-name">${s.name}</span><span class="skill-pct">${s.pct}%</span></div>
-        <div class="skill-track"><div class="skill-bar" data-width="${s.pct}%"></div></div>
-      </div>`).join('');
-    skillsGrid.appendChild(card);
-  });
+  if (skillsGrid) {
+    skillsGrid.innerHTML = '';
+    D.skills.forEach(cat => {
+      const card = document.createElement('div'); card.className = 'skill-card reveal';
+      card.innerHTML = `<div class="skill-cat">${cat.category}</div>` +
+        cat.items.map(s => `<div class="skill-item">
+          <div class="skill-header"><span class="skill-name">${s.name}</span><span class="skill-pct">${s.pct}%</span></div>
+          <div class="skill-track"><div class="skill-bar" data-width="${s.pct}%"></div></div>
+        </div>`).join('');
+      skillsGrid.appendChild(card);
+    });
+  }
 
   // ─── PROJECTS ───────────────────────────────────────────────────────────
   const projGrid = document.getElementById('projects-grid');
-  D.projects.forEach(p => {
-    const card = document.createElement('div'); card.className = 'project-card reveal';
-    card.innerHTML = `<div class="project-title">${p.title}</div>
-      <div class="project-desc">${p.desc}</div>
-      <div class="project-tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-      <div class="project-links">
-        ${p.demoLink ? `<a href="${p.demoLink}" class="project-link demo" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Live Demo</a>` : ''}
-        ${p.repoLink ? `<a href="${p.repoLink}" class="project-link repo" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a>` : ''}
-      </div>`;
-    projGrid.appendChild(card);
-  });
+  if (projGrid) {
+    projGrid.innerHTML = '';
+    D.projects.forEach(p => {
+      const card = document.createElement('div'); card.className = 'project-card reveal';
+      card.innerHTML = `<div class="project-title">${p.title}</div>
+        <div class="project-desc">${p.desc}</div>
+        <div class="project-tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div class="project-links">
+          ${p.demoLink ? `<a href="${p.demoLink}" class="project-link demo" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Live Demo</a>` : ''}
+          ${p.repoLink ? `<a href="${p.repoLink}" class="project-link repo" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a>` : ''}
+        </div>`;
+      projGrid.appendChild(card);
+    });
+  }
 
   // ─── EDUCATION ─────────────────────────────────────────────────────────
   const eduEl = document.getElementById('edu-timeline');
-  D.education.forEach(e => {
-    const item = document.createElement('div'); item.className = 'edu-item reveal';
-    item.innerHTML = `<div class="edu-inst">${e.institution}</div>
-      <div class="edu-degree">${e.degree}</div>
-      <div class="edu-meta"><span>📅 ${e.year}</span><span>🎓 ${e.gpa}</span></div>`;
-    eduEl.appendChild(item);
-  });
+  if (eduEl) {
+    eduEl.innerHTML = '';
+    D.education.forEach(e => {
+      const item = document.createElement('div'); item.className = 'edu-item reveal';
+      item.innerHTML = `<div class="edu-inst">${e.institution}</div>
+        <div class="edu-degree">${e.degree}</div>
+        <div class="edu-meta"><span>📅 ${e.year}</span><span>🎓 ${e.gpa}</span></div>`;
+      eduEl.appendChild(item);
+    });
+  }
 
   // ─── CERTIFICATIONS ─────────────────────────────────────────────────────
   const certEl = document.getElementById('cert-grid');
-  D.certifications.forEach(c => {
-    const card = document.createElement('div'); card.className = 'cert-card reveal';
-    card.innerHTML = `<div class="cert-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
-      <div><div class="cert-name">${c.name}</div><div class="cert-issuer">${c.issuer}</div></div>`;
-    certEl.appendChild(card);
-  });
+  if (certEl) {
+    certEl.innerHTML = '';
+    D.certifications.forEach(c => {
+      const card = document.createElement('div'); card.className = 'cert-card reveal';
+      card.innerHTML = `<div class="cert-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+        <div><div class="cert-name">${c.name}</div><div class="cert-issuer">${c.issuer}</div></div>`;
+      certEl.appendChild(card);
+    });
+  }
 
   // ─── ACHIEVEMENTS ───────────────────────────────────────────────────────
   const achEl = document.getElementById('achieve-list');
-  D.achievements.forEach(a => {
-    const item = document.createElement('div'); item.className = 'achieve-item reveal';
-    item.innerHTML = `<div class="achieve-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-      <div><div class="achieve-title">${a.title}</div><div class="achieve-sub">${a.sub}</div></div>`;
-    achEl.appendChild(item);
-  });
+  if (achEl) {
+    achEl.innerHTML = '';
+    D.achievements.forEach(a => {
+      const item = document.createElement('div'); item.className = 'achieve-item reveal';
+      item.innerHTML = `<div class="achieve-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <div><div class="achieve-title">${a.title}</div><div class="achieve-sub">${a.sub}</div></div>`;
+      achEl.appendChild(item);
+    });
+  }
 
   // ─── CONTACT ───────────────────────────────────────────────────────────
   const contactLinks = document.getElementById('contact-links');
+  if (contactLinks) {
+    contactLinks.innerHTML = '';
+    const cc = D.contact;
+    [
+      { href: `mailto:${cc.email}`, icon: 'mail', label: cc.email },
+      { href: `tel:${cc.phone}`, icon: 'phone', label: cc.phone },
+      { href: cc.github, icon: 'github', label: 'GitHub' },
+      { href: cc.linkedin, icon: 'linkedin', label: 'LinkedIn' }
+    ].filter(l=>l.href && l.href !== 'tel:undefined' && l.href !== 'mailto:undefined').forEach(l => {
+      const a = document.createElement('a'); a.className = 'contact-card'; a.href = l.href; a.target = '_blank';
+      a.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-feather="${l.icon}"></svg><span>${l.label}</span>`;
+      contactLinks.appendChild(a);
+    });
+  }
+
+  // Footer
+  document.getElementById('footer-text').innerHTML = D.footer || DEFAULT.footer;
+
+  // ─── VANTA ─────────────────────────────────────────────────────────────
+  try {
+    const vantaBg = document.getElementById('vanta-bg');
+    if (vantaBg && !vantaBg.classList.contains('vanta-initialized')) {
+      VANTA.GLOBE({ el: "#vanta-bg", mouseControls: true, touchControls: true, gyroControls: false, minHeight: 200, minWidth: 200, scale: 1, scaleMobile: 1, color: 0x6d28d9, backgroundColor: 0xf8fafc, size: 1.2 });
+      vantaBg.classList.add('vanta-initialized');
+    }
+  } catch(e) {}-links');
   const cc = D.contact;
   [
     { href: `mailto:${cc.email}`, icon: 'mail', label: cc.email },
@@ -277,6 +327,9 @@ function initPublicSite() {
     function getResumeUrl() {
       if (r.source === 'url') return r.url;
       if (!_blobUrl && r.pdfData) {
+        if (r.pdfData.startsWith('/uploads/') || r.pdfData.startsWith('http') || r.pdfData.startsWith('data:') === false) {
+          return r.pdfData;
+        }
         const arr = r.pdfData.split(',');
         const mime = arr[0].match(/:(.*?);/)[1];
         const bstr = atob(arr[1]); let n = bstr.length;
@@ -321,3 +374,21 @@ function initPublicSite() {
 initPublicSite();
 
 // Admin Panel logic has been fully moved to its own dedicated file: admin.js
+
+// Asynchronously fetch latest database portfolio data from backend if running under Node.js server!
+async function syncWithBackend() {
+  try {
+    const res = await fetch('/api/portfolio');
+    if (res.ok) {
+      const data = await res.json();
+      D = data;
+      // Sync cache to localStorage for offline robustness
+      localStorage.setItem('portfolioData', JSON.stringify(D));
+      // Re-run init to render live DB data
+      initPublicSite();
+    }
+  } catch (err) {
+    console.log("Local backend server not detected. Running in standalone static/localStorage mode.");
+  }
+}
+syncWithBackend();

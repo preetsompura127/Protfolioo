@@ -1,0 +1,181 @@
+const express = require('express');
+const cors = require('cors');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Enable CORS and JSON parsing
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Directories setup
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const DB_FILE = path.join(__dirname, 'database.json');
+
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR);
+}
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(UPLOADS_DIR));
+
+// Serve portfolio website static files
+app.use(express.static(__dirname));
+
+// Multer storage configuration for saving files as-is in the uploads directory
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, UPLOADS_DIR);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
+
+// Default template database structure
+const DEFAULT_DB = {
+  hero: {
+    name: "Preet Sompura",
+    subtitle: "3rd Year B.Tech CSE (AI) · Parul University",
+    badge: "Available for Internship",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Preet",
+    btn1Label: "Work With Me", btn1Link: "#contact",
+    btn2Label: "View Projects", btn2Link: "#projects",
+    typewords: ["Full-Stack Developer", "AI Enthusiast", "Open Source Contributor", "Problem Solver"]
+  },
+  about: {
+    bio: "3rd year B.Tech Computer Science Engineering student with Artificial Intelligence Specialization at Parul University, Vadodara with keen interest and practical exposure in AI, Machine Learning, and Web Development. Seeking a challenging internship position to apply acquired skills, work on creative projects, and contribute as a valuable team member.",
+    imgUrl: "png/WhatsApp Image 2026-05-12 at 8.48.22 PM (1).jpeg",
+    email: "preetsompura999@gmail.com",
+    phone: "+91 9376248717",
+    github: "github.com/preetsompura127",
+    linkedin: "linkedin.com/in/preet-sompura",
+    location: "Vadodara, Gujarat"
+  },
+  skills: [
+    { category: "Frontend Development", items: [{ name: "React.js", pct: 80 }, { name: "HTML & CSS", pct: 90 }, { name: "JavaScript", pct: 82 }] },
+    { category: "Backend & Database", items: [{ name: "Node.js", pct: 75 }, { name: "Express.js", pct: 73 }, { name: "MongoDB", pct: 70 }, { name: "REST APIs", pct: 78 }] },
+    { category: "AI / ML", items: [{ name: "Python", pct: 80 }, { name: "Pandas", pct: 72 }, { name: "Machine Learning", pct: 68 }, { name: "NLP", pct: 60 }] },
+    { category: "Tools & Others", items: [{ name: "Git & GitHub", pct: 85 }, { name: "VS Code", pct: 90 }, { name: "C / C++", pct: 65 }, { name: "Java (Basic)", pct: 55 }] }
+  ],
+  projects: [
+    {
+      title: "StyLoop — AI-Powered Smart Wardrobe Platform",
+      desc: "A full-stack AI web app where users digitize their wardrobe, get personalized outfit recommendations, and buy/sell preloved clothing in a thrift marketplace — live on Vercel. Integrated Google Gemini API for AI outfit suggestions based on occasion, weather, skin tone, and body type.",
+      tags: ["React.js", "Node.js", "Gemini API", "MongoDB"],
+      demoLink: "#",
+      repoLink: "https://github.com/preetsompura127"
+    }
+  ],
+  education: [
+    {
+      institution: "Parul University, Vadodara — Gujarat",
+      degree: "B.Tech in Computer Science Engineering with Artificial Intelligence Specialization",
+      year: "2023 – 2027",
+      gpa: "CGPA: 6.74"
+    }
+  ],
+  certifications: [
+    { name: "AWS Cloud Practitioner Essentials", issuer: "Amazon Web Services" },
+    { name: "Foundations of Prompt Engineering", issuer: "Amazon Web Services" },
+    { name: "Artificial Intelligence Fundamentals", issuer: "IBM SkillsBuild" },
+    { name: "Deloitte Data Analytics Job Simulation", issuer: "Deloitte via Forage" }
+  ],
+  achievements: [
+    { title: "Event Coordinator", sub: "ProjectionTech Fest, Parul University" }
+  ],
+  contact: {
+    email: "preetsompura999@gmail.com",
+    phone: "+91 9376248717",
+    github: "https://github.com/preetsompura127",
+    linkedin: "https://linkedin.com/in/preet-sompura",
+    leetcode: "https://leetcode.com/preetsompura",
+    desc: "I'm open to internship opportunities, collaborations, and exciting projects. Let's build something amazing together!"
+  },
+  resume: {
+    source: "upload",
+    url: "",
+    pdfName: "",
+    pdfData: ""
+  },
+  footer: "&copy; 2026 <strong>Preet Sompura</strong>. Crafted with passion & a lot of coffee &#9749;"
+};
+
+// Read Database Helper
+function readDb() {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      const data = fs.readFileSync(DB_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (err) {
+    console.error("Error reading database:", err);
+  }
+  
+  // Initialize with defaults if database file doesn't exist
+  writeDb(DEFAULT_DB);
+  return DEFAULT_DB;
+}
+
+// Write Database Helper
+function writeDb(data) {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    return true;
+  } catch (err) {
+    console.error("Error writing database:", err);
+    return false;
+  }
+}
+
+// API: Get portfolio data
+app.get('/api/portfolio', (req, res) => {
+  const dbData = readDb();
+  res.json(dbData);
+});
+
+// API: Save portfolio data
+app.post('/api/portfolio', (req, res) => {
+  const success = writeDb(req.body);
+  if (success) {
+    res.json({ success: true, message: "Portfolio saved successfully!" });
+  } else {
+    res.status(500).json({ success: false, message: "Failed to write to database." });
+  }
+});
+
+// API: File uploads
+app.post('/api/upload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: "No file uploaded." });
+  }
+  
+  // Return the web-relative URL to access the uploaded file
+  const fileUrl = `/uploads/${req.file.filename}`;
+  res.json({
+    success: true,
+    fileUrl: fileUrl,
+    fileName: req.file.originalname,
+    message: "File uploaded successfully!"
+  });
+});
+
+// Start Server
+app.listen(PORT, () => {
+  console.log(`====================================================`);
+  console.log(`🚀 Portfolio server is live at http://localhost:${PORT}`);
+  console.log(`📂 Uploads directory: ${UPLOADS_DIR}`);
+  console.log(`💾 Database file: ${DB_FILE}`);
+  console.log(`====================================================`);
+});
