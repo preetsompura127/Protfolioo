@@ -312,8 +312,9 @@ async function saveAll() {
   localStorage.setItem('portfolioData', JSON.stringify(D));
   
   // Persist to server backend database
+  const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
   try {
-    const res = await fetch('/api/portfolio', {
+    const res = await fetch(`${API_BASE}/api/portfolio`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(D)
@@ -397,9 +398,10 @@ function handleResumeUpload(input) {
 }
 
 async function uploadFileToServer(file) {
+  const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
   const formData = new FormData();
   formData.append('file', file);
-  const response = await fetch('/api/upload', {
+  const response = await fetch(`${API_BASE}/api/upload`, {
     method: 'POST',
     body: formData
   });
@@ -601,11 +603,24 @@ async function handleAboutUpload(input) {
 
 // ─── DOM CONTENT LOADED (Session persistence check) ──────────────────────
 async function syncAdminWithBackend() {
+  const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
   try {
-    const res = await fetch('/api/portfolio');
+    const res = await fetch(`${API_BASE}/api/portfolio`);
     if (res.ok) {
       const data = await res.json();
       D = data;
+      // Resolve uploaded relative URLs to full URL if opened via file:// protocol
+      if (window.location.protocol === 'file:') {
+        if (D.hero && D.hero.avatarUrl && D.hero.avatarUrl.startsWith('/uploads/')) {
+          D.hero.avatarUrl = 'http://localhost:3000' + D.hero.avatarUrl;
+        }
+        if (D.about && D.about.imgUrl && D.about.imgUrl.startsWith('/uploads/')) {
+          D.about.imgUrl = 'http://localhost:3000' + D.about.imgUrl;
+        }
+        if (D.resume && D.resume.pdfData && D.resume.pdfData.startsWith('/uploads/')) {
+          D.resume.pdfData = 'http://localhost:3000' + D.resume.pdfData;
+        }
+      }
       localStorage.setItem('portfolioData', JSON.stringify(D));
     }
   } catch (err) {
