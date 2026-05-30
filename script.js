@@ -254,14 +254,7 @@ function initPublicSite() {
   // Footer
   document.getElementById('footer-text').innerHTML = D.footer || DEFAULT.footer;
 
-  // ─── VANTA ─────────────────────────────────────────────────────────────
-  try {
-    const vantaBg = document.getElementById('vanta-bg');
-    if (vantaBg && !vantaBg.classList.contains('vanta-initialized')) {
-      VANTA.GLOBE({ el: "#vanta-bg", mouseControls: true, touchControls: true, gyroControls: false, minHeight: 200, minWidth: 200, scale: 1, scaleMobile: 1, color: 0x6d28d9, backgroundColor: 0xf8fafc, size: 1.2 });
-      vantaBg.classList.add('vanta-initialized');
-    }
-  } catch(e) {}
+  // Vanta Globe was replaced by custom high-performance animation.js (Interactive Swarm & Gravity Mesh)
 
   // ─── FEATHER ───────────────────────────────────────────────────────────
   try { feather.replace(); } catch(e) {}
