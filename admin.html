@@ -350,15 +350,30 @@
     <!-- SETTINGS -->
     <div class="panel" id="panel-settings">
       <div class="card">
+        <div class="card-title">🚀 GitHub Auto-Deploy (No Manual Push!)</div>
+        <div class="card-desc">Enter your repository details and a GitHub Token. When you click "Save All", updates will automatically commit to GitHub, triggering Vercel to rebuild.<br><strong style="color:var(--orange)">⚠️ Privacy Note: Your GitHub Token is stored locally in this browser's localStorage and is never uploaded.</strong></div>
+        <div class="field-row">
+          <div class="field"><label>GitHub Username</label><input type="text" id="g-user" placeholder="preetsompura127" /></div>
+          <div class="field"><label>Repository Name</label><input type="text" id="g-repo" placeholder="Protfolioo" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Branch</label><input type="text" id="g-branch" placeholder="main" /></div>
+          <div class="field"><label>GitHub Token (PAT)</label><input type="password" id="g-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="current-password" /></div>
+        </div>
+        <button class="save-btn" style="width:auto;" onclick="saveGitHubSettings()">Save GitHub Settings</button>
+      </div>
+
+      <div class="card">
         <div class="card-title">🔐 Change Password</div>
         <div class="card-desc">Update your admin panel password.</div>
-        <div class="field"><label>Current Password</label><input type="password" id="s-current" /></div>
+        <div class="field"><label>Current Password</label><input type="password" id="s-current" autocomplete="current-password" /></div>
         <div class="field-row">
-          <div class="field"><label>New Password</label><input type="password" id="s-new" /></div>
-          <div class="field"><label>Confirm New Password</label><input type="password" id="s-confirm" /></div>
+          <div class="field"><label>New Password</label><input type="password" id="s-new" autocomplete="new-password" /></div>
+          <div class="field"><label>Confirm New Password</label><input type="password" id="s-confirm" autocomplete="new-password" /></div>
         </div>
         <button class="save-btn" style="width:auto;" onclick="changePassword()">Update Password</button>
       </div>
+      
       <div class="card">
         <div class="card-title">🗑 Data Management</div>
         <div class="card-desc">Reset all portfolio data to defaults.</div>

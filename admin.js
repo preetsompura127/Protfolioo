@@ -135,6 +135,7 @@ function populateAll() {
   if (!D.resume) D.resume = JSON.parse(JSON.stringify(DEFAULT.resume));
   populateDash(); populateHero(); populateAbout(); populateSkills();
   populateProjects(); populateEdu(); populateCerts(); populateAchieves(); populateContact(); populateResume();
+  populateGitHubSettings();
 }
 
 function populateDash() {
@@ -311,8 +312,63 @@ async function saveAll() {
   // Persist locally as fallback
   localStorage.setItem('portfolioData', JSON.stringify(D));
   
-  // Trigger download of updated data.js file to store statically in local files
   const jsContent = `const portfolioData = ${JSON.stringify(D, null, 2)};`;
+
+  // Check if GitHub deploy credentials exist
+  const gUser = localStorage.getItem('gitUser');
+  const gRepo = localStorage.getItem('gitRepo');
+  const gBranch = localStorage.getItem('gitBranch') || 'main';
+  const gToken = localStorage.getItem('gitToken');
+
+  if (gUser && gRepo && gToken) {
+    toast('success', '⏳ Committing to GitHub...', 'Uploading data.js. Vercel deployment will start shortly...');
+    try {
+      // 1. Fetch current file to get SHA (needed for updating files in GitHub API)
+      const url = `https://api.github.com/repos/${gUser}/${gRepo}/contents/data.js?ref=${gBranch}`;
+      const res = await fetch(url, {
+        headers: { 'Authorization': `token ${gToken}` }
+      });
+      
+      let sha = null;
+      if (res.ok) {
+        const fileInfo = await res.json();
+        sha = fileInfo.sha;
+      }
+      
+      // Base64 encoding function supporting Unicode/UTF-8
+      const b64Content = btoa(unescape(encodeURIComponent(jsContent)));
+
+      // 2. Commit/Write file to GitHub repository
+      const putRes = await fetch(`https://api.github.com/repos/${gUser}/${gRepo}/contents/data.js`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${gToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'Update portfolioData from Admin Panel',
+          content: b64Content,
+          sha: sha,
+          branch: gBranch
+        })
+      });
+
+      if (putRes.ok) {
+        toast('success', '🚀 Saved & Pushed successfully!', 'Vercel is building the site now. Live in 1-2 minutes.');
+        populateDash();
+        return;
+      } else {
+        const errData = await putRes.json();
+        console.error("GitHub write error:", errData);
+        toast('error', '❌ GitHub Commit Failed', 'Downloaded fallback data.js file instead.');
+      }
+    } catch (err) {
+      console.error("GitHub API Connection Error:", err);
+      toast('error', '❌ GitHub Connection Failed', 'Downloaded fallback data.js file instead.');
+    }
+  }
+
+  // Fallback trigger download of updated data.js file to store statically in local files
   const blob = new Blob([jsContent], { type: 'application/javascript;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -493,6 +549,34 @@ function dataURLToBlob(dataURL) {
   const u8 = new Uint8Array(n);
   while(n--) u8[n] = bstr.charCodeAt(n);
   return new Blob([u8], { type: mime });
+}
+
+// ─── GITHUB SETTINGS ──────────────────────────────────────────────────────
+function saveGitHubSettings() {
+  const user = document.getElementById('g-user').value.trim();
+  const repo = document.getElementById('g-repo').value.trim();
+  const branch = document.getElementById('g-branch').value.trim() || 'main';
+  const token = document.getElementById('g-token').value.trim();
+  
+  localStorage.setItem('gitUser', user);
+  localStorage.setItem('gitRepo', repo);
+  localStorage.setItem('gitBranch', branch);
+  if (token) {
+    localStorage.setItem('gitToken', token);
+  }
+  toast('success', '🚀 GitHub Settings Saved!', 'Your changes will commit automatically upon saving.');
+}
+
+function populateGitHubSettings() {
+  const user = localStorage.getItem('gitUser') || '';
+  const repo = localStorage.getItem('gitRepo') || '';
+  const branch = localStorage.getItem('gitBranch') || 'main';
+  const token = localStorage.getItem('gitToken') || '';
+  
+  if (document.getElementById('g-user')) document.getElementById('g-user').value = user;
+  if (document.getElementById('g-repo')) document.getElementById('g-repo').value = repo;
+  if (document.getElementById('g-branch')) document.getElementById('g-branch').value = branch;
+  if (document.getElementById('g-token')) document.getElementById('g-token').value = token;
 }
 
 // ─── SETTINGS ─────────────────────────────────────────────────────────────
