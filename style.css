@@ -399,4 +399,43 @@ footer strong { color: var(--accent3); }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-8px); } }
 
+/* ── RESPONSIVE DESIGN (MOBILE MEDIA QUERIES) ── */
+@media (max-width: 768px) {
+  /* Navbar adjustments */
+  .nav-links { display: none; }
+  .nav-hamburger { display: block; }
+  
+  /* Layout padding */
+  section { padding: 4.5rem 1.2rem; }
+  
+  /* About section stacking */
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    text-align: center;
+  }
+  .about-img-wrap {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  .about-resume-wrap {
+    justify-content: center;
+  }
+  
+  /* Skill Grid Adaptations */
+  .skills-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  
+  /* Contact section adaptations */
+  .contact-wrap {
+    padding: 2rem 1.2rem;
+  }
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+}
+
 /* Admin Panel styles are located separately in admin.css */

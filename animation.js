@@ -1,9 +1,7 @@
 // ─── INTERACTIVE QUANTUM SWARM CURSOR & GRAVITY MESH ───────────────────
 
 (function() {
-  // Disable on touchscreen-only devices to preserve mobile usability and battery life
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  if (isTouchDevice) return;
 
   const hero = document.getElementById('hero');
   if (!hero) return;
@@ -25,31 +23,36 @@
   
   hero.appendChild(bgCanvas);
 
-  // 2. Create Foreground Canvas (Interactive Cursor) globally
-  const cursorCanvas = document.createElement('canvas');
-  cursorCanvas.id = 'cursor-canvas';
-  cursorCanvas.style.position = 'fixed';
-  cursorCanvas.style.top = '0';
-  cursorCanvas.style.left = '0';
-  cursorCanvas.style.width = '100%';
-  cursorCanvas.style.height = '100%';
-  cursorCanvas.style.pointerEvents = 'none';
-  cursorCanvas.style.zIndex = '999999';
-  document.body.appendChild(cursorCanvas);
+  // 2. Create Foreground Canvas (Interactive Cursor) globally ONLY for non-touch devices
+  let cursorCanvas = null;
+  let cursorCtx = null;
 
-  // Hide default cursor in CSS on hover-capable devices
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @media (hover: hover) {
-      body, a, button, select, textarea, input, .social-icon, .contact-card, .project-card, .btn-primary, .btn-outline, .btn-resume, .btn-resume-view, .btn-resume-dl, .nav-resume-btn, .nav-hamburger, .nav-links a {
-        cursor: none !important;
+  if (!isTouchDevice) {
+    cursorCanvas = document.createElement('canvas');
+    cursorCanvas.id = 'cursor-canvas';
+    cursorCanvas.style.position = 'fixed';
+    cursorCanvas.style.top = '0';
+    cursorCanvas.style.left = '0';
+    cursorCanvas.style.width = '100%';
+    cursorCanvas.style.height = '100%';
+    cursorCanvas.style.pointerEvents = 'none';
+    cursorCanvas.style.zIndex = '999999';
+    document.body.appendChild(cursorCanvas);
+    cursorCtx = cursorCanvas.getContext('2d');
+
+    // Hide default cursor in CSS on hover-capable devices
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @media (hover: hover) {
+        body, a, button, select, textarea, input, .social-icon, .contact-card, .project-card, .btn-primary, .btn-outline, .btn-resume, .btn-resume-view, .btn-resume-dl, .nav-resume-btn, .nav-hamburger, .nav-links a {
+          cursor: none !important;
+        }
       }
-    }
-  `;
-  document.head.appendChild(style);
+    `;
+    document.head.appendChild(style);
+  }
 
   const bgCtx = bgCanvas.getContext('2d');
-  const cursorCtx = cursorCanvas.getContext('2d');
 
   let width = hero.offsetWidth;
   let height = hero.offsetHeight;
@@ -65,8 +68,10 @@
     bgCanvas.width = width;
     bgCanvas.height = height;
     
-    cursorCanvas.width = winW;
-    cursorCanvas.height = winH;
+    if (cursorCanvas) {
+      cursorCanvas.width = winW;
+      cursorCanvas.height = winH;
+    }
   }
   window.addEventListener('resize', resize);
   resize();
@@ -77,58 +82,101 @@
   let lastMouseX = winW / 2;
   let lastMouseY = winH / 2;
 
-  // Magnetic Hover State
+  // Touch State for Mobile
+  let touchActive = false;
+
+  // Magnetic Hover State for Desktop
   let hoveredElement = null;
   let hoverRect = null;
   let magnetActive = false;
-
-  window.addEventListener('mousemove', (e) => {
-    mouse.tx = e.clientX;
-    mouse.ty = e.clientY;
-
-    // Calculate mouse velocity for trailing animations
-    const dx = mouse.tx - lastMouseX;
-    const dy = mouse.ty - lastMouseY;
-    mouse.speed = Math.sqrt(dx*dx + dy*dy);
-    lastMouseX = mouse.tx;
-    lastMouseY = mouse.ty;
-
-    // Direct check for interactive hover elements to snap cursor
-    const target = e.target;
-    const interactive = target.closest('a, button, .social-icon, .contact-card, .project-card, .nav-links a');
-    if (interactive) {
-      hoveredElement = interactive;
-      hoverRect = interactive.getBoundingClientRect();
-      magnetActive = true;
-    } else {
-      hoveredElement = null;
-      hoverRect = null;
-      magnetActive = false;
-    }
-  });
-
-  // Ripple wave effect on click
   const shockwaves = [];
-  window.addEventListener('mousedown', (e) => {
-    // Only trigger background shockwaves if click happens inside the Hero bounds
-    const rect = hero.getBoundingClientRect();
-    if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
-      const heroX = e.clientX - rect.left;
-      const heroY = e.clientY - rect.top;
-      shockwaves.push({
-        x: heroX,
-        y: heroY,
-        radius: 0,
-        maxRadius: 300,
-        speed: 7,
-        force: 18
-      });
-    }
-  });
+
+  // ─── INTERACTION EVENT LISTENERS ───────────────────────────────────────
+  if (!isTouchDevice) {
+    // Desktop Mouse Move listener
+    window.addEventListener('mousemove', (e) => {
+      mouse.tx = e.clientX;
+      mouse.ty = e.clientY;
+
+      // Calculate mouse velocity for trailing animations
+      const dx = mouse.tx - lastMouseX;
+      const dy = mouse.ty - lastMouseY;
+      mouse.speed = Math.sqrt(dx*dx + dy*dy);
+      lastMouseX = mouse.tx;
+      lastMouseY = mouse.ty;
+
+      // Direct check for interactive hover elements to snap cursor
+      const target = e.target;
+      const interactive = target.closest('a, button, .social-icon, .contact-card, .project-card, .nav-links a');
+      if (interactive) {
+        hoveredElement = interactive;
+        hoverRect = interactive.getBoundingClientRect();
+        magnetActive = true;
+      } else {
+        hoveredElement = null;
+        hoverRect = null;
+        magnetActive = false;
+      }
+    });
+
+    // Desktop Click Ripple listener
+    window.addEventListener('mousedown', (e) => {
+      const rect = hero.getBoundingClientRect();
+      if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+        const heroX = e.clientX - rect.left;
+        const heroY = e.clientY - rect.top;
+        shockwaves.push({
+          x: heroX,
+          y: heroY,
+          radius: 0,
+          maxRadius: 300,
+          speed: 7,
+          force: 18
+        });
+      }
+    });
+  } else {
+    // Mobile Touch interaction listener
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        touchActive = true;
+        const t = e.touches[0];
+        mouse.tx = t.clientX;
+        mouse.ty = t.clientY;
+
+        const rect = hero.getBoundingClientRect();
+        if (t.clientX >= rect.left && t.clientX <= rect.right && t.clientY >= rect.top && t.clientY <= rect.bottom) {
+          const heroX = t.clientX - rect.left;
+          const heroY = t.clientY - rect.top;
+          shockwaves.push({
+            x: heroX,
+            y: heroY,
+            radius: 0,
+            maxRadius: 180, // smaller ripple on mobile
+            speed: 5,
+            force: 12
+          });
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        touchActive = true;
+        const t = e.touches[0];
+        mouse.tx = t.clientX;
+        mouse.ty = t.clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      touchActive = false;
+    });
+  }
 
   // ─── BG GRAVITY MESH NETWORK ───────────────────────────────────────────
   const nodes = [];
-  const nodeCount = 75;
+  const nodeCount = isTouchDevice ? 32 : 75; // optimized count for mobile frames
 
   for (let i = 0; i < nodeCount; i++) {
     nodes.push({
@@ -138,7 +186,7 @@
       y0: Math.random() * height,
       vx: 0,
       vy: 0,
-      radius: Math.random() * 2 + 1.2,
+      radius: Math.random() * 2 + (isTouchDevice ? 1.0 : 1.2), // slightly smaller dots on mobile
       angle: Math.random() * Math.PI * 2,
       speed: Math.random() * 0.4 + 0.15,
     });
@@ -146,7 +194,6 @@
 
   function updateBgNodes() {
     const heroRect = hero.getBoundingClientRect();
-    // Convert client coordinates to hero-relative coordinates for calculations
     const mouseHeroX = mouse.tx - heroRect.left;
     const mouseHeroY = mouse.ty - heroRect.top;
 
@@ -159,20 +206,22 @@
       let targetX = node.x0;
       let targetY = node.y0;
 
-      // 2. Gravitational warp from cursor
-      const dx = mouseHeroX - node.x;
-      const dy = mouseHeroY - node.y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      const gravityRadius = 250;
+      // 2. Gravitational warp from cursor/finger touch
+      if (!isTouchDevice || touchActive) {
+        const dx = mouseHeroX - node.x;
+        const dy = mouseHeroY - node.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const gravityRadius = isTouchDevice ? 150 : 250;
 
-      if (dist < gravityRadius) {
-        // Bend nodes towards cursor
-        const strength = (gravityRadius - dist) / gravityRadius;
-        targetX -= (dx / dist) * strength * 90;
-        targetY -= (dy / dist) * strength * 90;
+        if (dist < gravityRadius) {
+          // Bend nodes towards cursor
+          const strength = (gravityRadius - dist) / gravityRadius;
+          targetX -= (dx / dist) * strength * (isTouchDevice ? 45 : 90);
+          targetY -= (dy / dist) * strength * (isTouchDevice ? 45 : 90);
+        }
       }
 
-      // 3. Click shockwaves
+      // 3. Click/Touch shockwaves
       shockwaves.forEach(wave => {
         const wdx = node.x - wave.x;
         const wdy = node.y - wave.y;
@@ -208,17 +257,16 @@
     bgCtx.clearRect(0, 0, width, height);
 
     // Draw mesh connection lines
-    bgCtx.lineWidth = 0.75;
+    bgCtx.lineWidth = isTouchDevice ? 0.55 : 0.75;
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const dx = nodes[i].x - nodes[j].x;
         const dy = nodes[i].y - nodes[j].y;
         const dist = Math.sqrt(dx*dx + dy*dy);
-        const maxDist = 130;
+        const maxDist = isTouchDevice ? 100 : 130; // shorter lines on mobile
 
         if (dist < maxDist) {
-          const alpha = (1 - dist / maxDist) * 0.12;
-          // Beautiful fading purple lines
+          const alpha = (1 - dist / maxDist) * (isTouchDevice ? 0.09 : 0.12);
           bgCtx.strokeStyle = `rgba(109, 40, 217, ${alpha})`;
           bgCtx.beginPath();
           bgCtx.moveTo(nodes[i].x, nodes[i].y);
@@ -231,8 +279,8 @@
     // Draw active shockwave ripples
     shockwaves.forEach(wave => {
       const alpha = (1 - wave.radius / wave.maxRadius) * 0.25;
-      bgCtx.strokeStyle = `rgba(8, 145, 178, ${alpha})`; // cyan shockwave ring
-      bgCtx.lineWidth = 2;
+      bgCtx.strokeStyle = `rgba(8, 145, 178, ${alpha})`;
+      bgCtx.lineWidth = 1.5;
       bgCtx.beginPath();
       bgCtx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2);
       bgCtx.stroke();
@@ -248,43 +296,37 @@
   }
 
 
-  // ─── CURSOR SWARM PHYSICS ──────────────────────────────────────────────
+  // ─── CURSOR SWARM PHYSICS (Desktop Only) ──────────────────────────────
   const swarmCount = 18;
   const particles = [];
-
-  for (let i = 0; i < swarmCount; i++) {
-    particles.push({
-      x: winW / 2,
-      y: winH / 2,
-      vx: 0,
-      vy: 0,
-      angle: (i / swarmCount) * Math.PI * 2,
-      orbitSpeed: 0.035 + Math.random() * 0.015,
-      orbitRadius: 18 + Math.random() * 7,
-      size: Math.random() * 1.5 + 1.2,
-      color: i % 2 === 0 ? 'rgba(109, 40, 217, 0.8)' : 'rgba(8, 145, 178, 0.8)' // Purple and Cyan sparks
-    });
-  }
-
-  // Smooth trail history for cursor movement
   const trailHistory = [];
   const trailMaxLength = 8;
+
+  if (!isTouchDevice) {
+    for (let i = 0; i < swarmCount; i++) {
+      particles.push({
+        x: winW / 2,
+        y: winH / 2,
+        vx: 0,
+        vy: 0,
+        angle: (i / swarmCount) * Math.PI * 2,
+        orbitSpeed: 0.035 + Math.random() * 0.015,
+        orbitRadius: 18 + Math.random() * 7,
+        size: Math.random() * 1.5 + 1.2,
+        color: i % 2 === 0 ? 'rgba(109, 40, 217, 0.8)' : 'rgba(8, 145, 178, 0.8)'
+      });
+    }
+  }
 
   function updateCursorSwarm() {
     let targetX = mouse.tx;
     let targetY = mouse.ty;
 
-    // Check magnet snap
     if (magnetActive && hoverRect) {
-      const elCenterX = hoverRect.left + hoverRect.width / 2;
-      const elCenterY = hoverRect.top + hoverRect.height / 2;
-      
-      // Interpolate center toward element to snap magnetically
-      targetX = elCenterX;
-      targetY = elCenterY;
+      targetX = hoverRect.left + hoverRect.width / 2;
+      targetY = hoverRect.top + hoverRect.height / 2;
     }
 
-    // Apply inertia and friction to main cursor coordinates
     cursor.vx += (targetX - cursor.x) * 0.25;
     cursor.vy += (targetY - cursor.y) * 0.25;
     cursor.vx *= 0.6;
@@ -292,20 +334,17 @@
     cursor.x += cursor.vx;
     cursor.y += cursor.vy;
 
-    // Add trail coordinate
     trailHistory.push({ x: cursor.x, y: cursor.y });
     if (trailHistory.length > trailMaxLength) {
       trailHistory.shift();
     }
 
-    // Update orbiting swarm sparks
     particles.forEach(p => {
       p.angle += p.orbitSpeed;
 
       let targetPx, targetPy;
 
       if (magnetActive && hoverRect) {
-        // Snap swarm to shape outline box
         const padding = 10;
         const rectW = hoverRect.width + padding * 2;
         const rectH = hoverRect.height + padding * 2;
@@ -313,14 +352,12 @@
         const cos = Math.cos(p.angle);
         const sin = Math.sin(p.angle);
 
-        // Clamping angles to rectangular border
         const borderX = Math.sign(cos) * (rectW / 2);
         const borderY = Math.sign(sin) * (rectH / 2);
 
         targetPx = cursor.x + borderX;
         targetPy = cursor.y + borderY;
       } else {
-        // Circle orbit trails stretching slightly with velocity
         const speedStretch = Math.min(25, mouse.speed * 0.7);
         const orbitRadius = p.orbitRadius + speedStretch;
 
@@ -343,7 +380,6 @@
   function drawCursorSwarm() {
     cursorCtx.clearRect(0, 0, winW, winH);
 
-    // 1. Draw motion trail lines (glow tail)
     if (trailHistory.length > 1) {
       cursorCtx.beginPath();
       cursorCtx.moveTo(trailHistory[0].x, trailHistory[0].y);
@@ -355,15 +391,14 @@
         trailHistory[0].x, trailHistory[0].y, 
         trailHistory[trailHistory.length - 1].x, trailHistory[trailHistory.length - 1].y
       );
-      grad.addColorStop(0, 'rgba(8, 145, 178, 0)'); // fade out
-      grad.addColorStop(1, 'rgba(109, 40, 217, 0.35)'); // purple core
+      grad.addColorStop(0, 'rgba(8, 145, 178, 0)');
+      grad.addColorStop(1, 'rgba(109, 40, 217, 0.35)');
       cursorCtx.strokeStyle = grad;
       cursorCtx.lineCap = 'round';
       cursorCtx.lineJoin = 'round';
       cursorCtx.stroke();
     }
 
-    // 2. Draw particle connection lattice
     if (!magnetActive) {
       cursorCtx.strokeStyle = 'rgba(139, 92, 246, 0.05)';
       cursorCtx.lineWidth = 0.5;
@@ -381,7 +416,6 @@
         }
       }
     } else {
-      // Draw rectangular focus box surrounding target
       cursorCtx.strokeStyle = 'rgba(8, 145, 178, 0.2)';
       cursorCtx.lineWidth = 1;
       cursorCtx.strokeRect(
@@ -392,7 +426,6 @@
       );
     }
 
-    // 3. Draw central glowing dot
     cursorCtx.fillStyle = magnetActive ? 'rgba(8, 145, 178, 0.9)' : 'rgba(109, 40, 217, 0.9)';
     cursorCtx.shadowBlur = magnetActive ? 15 : 10;
     cursorCtx.shadowColor = magnetActive ? '#0891b2' : '#6d28d9';
@@ -401,10 +434,8 @@
     cursorCtx.arc(cursor.x, cursor.y, magnetActive ? 3 : 4, 0, Math.PI * 2);
     cursorCtx.fill();
     
-    // Clear shadow state for rendering other elements
     cursorCtx.shadowBlur = 0;
 
-    // 4. Draw floating particles
     particles.forEach(p => {
       cursorCtx.fillStyle = p.color;
       cursorCtx.beginPath();
@@ -418,12 +449,13 @@
     updateBgNodes();
     drawBgMesh();
 
-    updateCursorSwarm();
-    drawCursorSwarm();
+    if (!isTouchDevice) {
+      updateCursorSwarm();
+      drawCursorSwarm();
+    }
 
     requestAnimationFrame(loop);
   }
   
-  // Start loop
   loop();
 })();
