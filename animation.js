@@ -1,4 +1,4 @@
-// ─── INTERACTIVE QUANTUM SWARM CURSOR & GRAVITY MESH ───────────────────
+// ─── INTERACTIVE QUANTUM SWARM CURSOR & GRAVITY MESH WITH SOUNDS ───────
 
 (function() {
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -6,6 +6,98 @@
   const hero = document.getElementById('hero');
   if (!hero) return;
 
+  // ─── AUDIO SYNTHESIS SYSTEM (WEB AUDIO API) ───────────────────────────
+  let welcomePlayed = false;
+
+  // 1. Futuristic rising ambient startup hum (on first screen interaction)
+  function playWelcomeSound() {
+    if (welcomePlayed) return;
+    welcomePlayed = true;
+
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      osc1.connect(gainNode);
+      osc2.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      // Low ambient hum rise
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(80, audioCtx.currentTime);
+      osc1.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.7);
+
+      // Higher-pitched chime chord rise
+      osc2.type = 'triangle';
+      osc2.frequency.setValueAtTime(330, audioCtx.currentTime);
+      osc2.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.6);
+
+      // Soft volume envelope (attack and decay)
+      gainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.15); // soft peak
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.7);
+
+      osc1.start(audioCtx.currentTime);
+      osc2.start(audioCtx.currentTime);
+
+      osc1.stop(audioCtx.currentTime + 0.7);
+      osc2.stop(audioCtx.currentTime + 0.7);
+    } catch (e) {
+      console.warn("Web Audio Welcome failed to initialize:", e);
+    }
+  }
+
+  // 2. Crisp futuristic UI click chime (on clicking buttons and links)
+  function playClickSound() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1500, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.08);
+
+      gainNode.gain.setValueAtTime(0.06, audioCtx.currentTime); // subtle click
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.08);
+    } catch (e) {
+      console.warn("Web Audio Click failed:", e);
+    }
+  }
+
+  // 3. Low-frequency deep sub-bass shockwave rumble (on background ripples)
+  function playRippleSound() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.45);
+
+      gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime); // solid sub-bass
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.45);
+    } catch (e) {
+      console.warn("Web Audio Ripple failed:", e);
+    }
+  }
+
+  // ─── CANVAS CREATION ──────────────────────────────────────────────────
   // 1. Create Background Canvas (Mesh Network) inside Hero Section
   const bgCanvas = document.createElement('canvas');
   bgCanvas.id = 'bg-canvas';
@@ -98,14 +190,12 @@
       mouse.tx = e.clientX;
       mouse.ty = e.clientY;
 
-      // Calculate mouse velocity for trailing animations
       const dx = mouse.tx - lastMouseX;
       const dy = mouse.ty - lastMouseY;
       mouse.speed = Math.sqrt(dx*dx + dy*dy);
       lastMouseX = mouse.tx;
       lastMouseY = mouse.ty;
 
-      // Direct check for interactive hover elements to snap cursor
       const target = e.target;
       const interactive = target.closest('a, button, .social-icon, .contact-card, .project-card, .nav-links a');
       if (interactive) {
@@ -119,46 +209,64 @@
       }
     });
 
-    // Desktop Click Ripple listener
+    // Desktop Click listener (handles click sound triggers & welcome chords)
     window.addEventListener('mousedown', (e) => {
-      const rect = hero.getBoundingClientRect();
-      if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
-        const heroX = e.clientX - rect.left;
-        const heroY = e.clientY - rect.top;
-        shockwaves.push({
-          x: heroX,
-          y: heroY,
-          radius: 0,
-          maxRadius: 300,
-          speed: 7,
-          force: 18
-        });
+      playWelcomeSound();
+
+      const interactive = e.target.closest('a, button, .social-icon, .contact-card, .project-card, .nav-links a');
+      if (interactive) {
+        playClickSound();
+      } else {
+        // Trigger ripple and sub-bass shockwave sound inside hero
+        const rect = hero.getBoundingClientRect();
+        if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+          const heroX = e.clientX - rect.left;
+          const heroY = e.clientY - rect.top;
+          shockwaves.push({
+            x: heroX,
+            y: heroY,
+            radius: 0,
+            maxRadius: 300,
+            speed: 7,
+            force: 18
+          });
+          playRippleSound();
+        }
       }
     });
   } else {
     // Mobile Touch interaction listener
     window.addEventListener('touchstart', (e) => {
+      playWelcomeSound();
+
       if (e.touches && e.touches[0]) {
         touchActive = true;
         const t = e.touches[0];
         mouse.tx = t.clientX;
         mouse.ty = t.clientY;
 
-        const rect = hero.getBoundingClientRect();
-        if (t.clientX >= rect.left && t.clientX <= rect.right && t.clientY >= rect.top && t.clientY <= rect.bottom) {
-          const heroX = t.clientX - rect.left;
-          const heroY = t.clientY - rect.top;
-          shockwaves.push({
-            x: heroX,
-            y: heroY,
-            radius: 0,
-            maxRadius: 180, // smaller ripple on mobile
-            speed: 5,
-            force: 12
-          });
+        const interactive = t.target.closest('a, button, .social-icon, .contact-card, .project-card, .nav-links a');
+        if (interactive) {
+          playClickSound();
+        } else {
+          // Trigger mobile touch ripple and sub-bass sound
+          const rect = hero.getBoundingClientRect();
+          if (t.clientX >= rect.left && t.clientX <= rect.right && t.clientY >= rect.top && t.clientY <= rect.bottom) {
+            const heroX = t.clientX - rect.left;
+            const heroY = t.clientY - rect.top;
+            shockwaves.push({
+              x: heroX,
+              y: heroY,
+              radius: 0,
+              maxRadius: 180,
+              speed: 5,
+              force: 12
+            });
+            playRippleSound();
+          }
         }
       }
-    }, { passive: true });
+    });
 
     window.addEventListener('touchmove', (e) => {
       if (e.touches && e.touches[0]) {
@@ -167,7 +275,7 @@
         mouse.tx = t.clientX;
         mouse.ty = t.clientY;
       }
-    }, { passive: true });
+    });
 
     window.addEventListener('touchend', () => {
       touchActive = false;
@@ -176,7 +284,7 @@
 
   // ─── BG GRAVITY MESH NETWORK ───────────────────────────────────────────
   const nodes = [];
-  const nodeCount = isTouchDevice ? 32 : 75; // optimized count for mobile frames
+  const nodeCount = isTouchDevice ? 32 : 75;
 
   for (let i = 0; i < nodeCount; i++) {
     nodes.push({
@@ -186,7 +294,7 @@
       y0: Math.random() * height,
       vx: 0,
       vy: 0,
-      radius: Math.random() * 2 + (isTouchDevice ? 1.0 : 1.2), // slightly smaller dots on mobile
+      radius: Math.random() * 2 + (isTouchDevice ? 1.0 : 1.2),
       angle: Math.random() * Math.PI * 2,
       speed: Math.random() * 0.4 + 0.15,
     });
@@ -214,7 +322,6 @@
         const gravityRadius = isTouchDevice ? 150 : 250;
 
         if (dist < gravityRadius) {
-          // Bend nodes towards cursor
           const strength = (gravityRadius - dist) / gravityRadius;
           targetX -= (dx / dist) * strength * (isTouchDevice ? 45 : 90);
           targetY -= (dy / dist) * strength * (isTouchDevice ? 45 : 90);
@@ -263,7 +370,7 @@
         const dx = nodes[i].x - nodes[j].x;
         const dy = nodes[i].y - nodes[j].y;
         const dist = Math.sqrt(dx*dx + dy*dy);
-        const maxDist = isTouchDevice ? 100 : 130; // shorter lines on mobile
+        const maxDist = isTouchDevice ? 100 : 130;
 
         if (dist < maxDist) {
           const alpha = (1 - dist / maxDist) * (isTouchDevice ? 0.09 : 0.12);
