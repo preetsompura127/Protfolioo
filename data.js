@@ -160,8 +160,8 @@ const portfolioData = {
       "sub": "ProjectionTech Fest, Parul University"
     },
     {
-      "title": "porn hub",
-      "sub": "gop gop"
+      "title": "cordinator",
+      "sub": "mff"
     }
   ],
   "contact": {
