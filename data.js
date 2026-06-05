@@ -158,10 +158,6 @@ const portfolioData = {
     {
       "title": "Event Coordinator",
       "sub": "ProjectionTech Fest, Parul University"
-    },
-    {
-      "title": "cordinator",
-      "sub": "mff"
     }
   ],
   "contact": {
