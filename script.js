@@ -282,65 +282,48 @@ function initPublicSite() {
   // ─── RESUME ─────────────────────────────────────────────────────────────
   (function initResume() {
     const r = D.resume;
-    if (!r) return;
-    const hasResume = (r.source === 'upload' && r.pdfData) || (r.source === 'url' && r.url);
-    if (!hasResume) return;
 
-    // Show nav links
-    const navLink = document.getElementById('nav-resume-link');
+    // Always show resume buttons — auto-generated resume.html always exists
+    const navLink    = document.getElementById('nav-resume-link');
     const mobileLink = document.getElementById('mobile-resume-link');
-    const heroBtn = document.getElementById('hero-resume-btn');
-    const aboutWrap = document.getElementById('about-resume-wrap');
-    if (navLink)    navLink.style.display = '';
+    const heroBtn    = document.getElementById('hero-resume-btn');
+    const aboutWrap  = document.getElementById('about-resume-wrap');
+    if (navLink)    navLink.style.display    = '';
     if (mobileLink) mobileLink.style.display = '';
-    if (heroBtn)    heroBtn.style.display = '';
-    if (aboutWrap)  aboutWrap.style.display = 'flex';
+    if (heroBtn)    heroBtn.style.display    = '';
+    if (aboutWrap)  aboutWrap.style.display  = 'flex';
 
-    // Build a reusable blob URL (only once for uploaded PDFs)
-    let _blobUrl = null;
-    function getResumeUrl() {
-      if (r.source === 'url') return r.url;
-      if (!_blobUrl && r.pdfData) {
-        if (r.pdfData.startsWith('/uploads/') || r.pdfData.startsWith('http') || r.pdfData.startsWith('data:') === false) {
-          return r.pdfData;
-        }
-        const arr = r.pdfData.split(',');
-        const mime = arr[0].match(/:(.*?);/)[1];
-        const bstr = atob(arr[1]); let n = bstr.length;
-        const u8 = new Uint8Array(n);
-        while (n--) u8[n] = bstr.charCodeAt(n);
-        _blobUrl = URL.createObjectURL(new Blob([u8], { type: mime }));
-      }
-      return _blobUrl;
-    }
-
-    // viewResume — open in new tab
+    // viewResume => open auto-generated resume.html in new tab
     window.viewResume = function(e) {
       if (e) e.preventDefault();
-      const url = getResumeUrl();
-      if (url) window.open(url, '_blank');
+      window.open('resume.html', '_blank');
     };
 
-    // downloadResume — trigger download
+    // downloadResume => use uploaded PDF if available, else open resume.html (Ctrl+P to save PDF)
     window.downloadResume = function(e) {
       if (e) e.preventDefault();
-      if (r.source === 'url') {
-        // For external URLs just open in new tab
-        window.open(r.url, '_blank');
-        return;
+      var hasPdf = r && ((r.source === 'upload' && r.pdfData) || (r.source === 'url' && r.url));
+      if (hasPdf) {
+        if (r.source === 'url') { window.open(r.url, '_blank'); return; }
+        var arr  = r.pdfData.split(',');
+        var mime = arr[0].match(/:(.*?);/)[1];
+        var bstr = atob(arr[1]); var n = bstr.length;
+        var u8   = new Uint8Array(n);
+        while (n--) u8[n] = bstr.charCodeAt(n);
+        var blob = new Blob([u8], { type: mime });
+        var url  = URL.createObjectURL(blob);
+        var a    = document.createElement('a');
+        a.href = url; a.download = r.pdfName || 'Preet_Sompura_Resume.pdf';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
+      } else {
+        // No PDF uploaded — open resume.html; user can Print > Save as PDF
+        window.open('resume.html', '_blank');
       }
-      const url = getResumeUrl();
-      if (!url) return;
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = r.pdfName || 'resume.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
     };
   })();
 
-  // Fallback no-ops so onclick attributes don't error if resume not set
+  // Fallback no-ops
   if (!window.viewResume)     window.viewResume     = function(e) { if(e) e.preventDefault(); };
   if (!window.downloadResume) window.downloadResume = function(e) { if(e) e.preventDefault(); };
 }

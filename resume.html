@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="resume-tab-title">Preet Sompura — Resume</title>
+  <meta name="description" content="Resume of Preet Sompura — B.Tech CSE (AI) student, Full-Stack Developer & AI Enthusiast." />
+
+  <!-- Google Fonts — matches LaTeX Fira/TG Heros sans-serif feel -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for icons (matches \faPhone, \faEnvelope, etc.) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ─── ROOT & RESET ────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --text-dark:   #141414;
+      --text-mid:    #444;
+      --text-light:  #6b6b6b;
+      --rule-color:  #bbb;
+      --accent:      #1a56db;
+      --bg:          #fff;
+      --page-w:      760px;
+      --font:        'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* ─── SCREEN WRAPPER ──────────────────────────────── */
+    body {
+      font-family: var(--font);
+      background: #e8edf2;
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* ─── TOP TOOLBAR ─────────────────────────────────── */
+    #toolbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1.5rem;
+      gap: 1rem;
+      box-shadow: 0 2px 12px #0004;
+    }
+    #toolbar .t-left {
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    #toolbar .back-btn {
+      background: none; border: 1.5px solid #475569; border-radius: 6px;
+      color: #cbd5e1; font-size: 0.82rem; padding: 0.3rem 0.8rem;
+      cursor: pointer; display: flex; align-items: center; gap: 5px;
+      text-decoration: none; transition: border-color .2s, color .2s;
+    }
+    #toolbar .back-btn:hover { border-color: #60a5fa; color: #93c5fd; }
+    #toolbar .t-title {
+      font-size: 0.9rem; font-weight: 600; color: #f1f5f9;
+      letter-spacing: 0.02em;
+    }
+    #toolbar .t-badge {
+      font-size: 0.72rem; background: #1d4ed8; color: #fff;
+      border-radius: 4px; padding: 2px 8px; font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    #toolbar .t-right { display: flex; gap: 0.6rem; }
+    .tb-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0.38rem 1rem; border-radius: 7px; font-size: 0.82rem;
+      font-weight: 600; cursor: pointer; border: none; transition: all .2s;
+      text-decoration: none;
+    }
+    #btn-print {
+      background: #334155; color: #e2e8f0;
+    }
+    #btn-print:hover { background: #475569; }
+    #btn-download {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+    }
+    #btn-download:hover { background: linear-gradient(135deg,#3b82f6,#2563eb); transform:translateY(-1px); }
+
+    /* ─── PAGE (A4-like) ──────────────────────────────── */
+    #resume-page {
+      max-width: var(--page-w);
+      margin: 72px auto 40px;
+      background: var(--bg);
+      padding: 42px 48px 40px;
+      box-shadow: 0 4px 32px #0002, 0 1px 4px #0001;
+      border-radius: 2px;
+      font-size: 10.5pt;
+      line-height: 1.45;
+    }
+
+    /* ─── HEADER ──────────────────────────────────────── */
+    #r-header { text-align: center; margin-bottom: 10px; }
+    #r-name {
+      font-size: 22pt; font-weight: 800;
+      color: var(--text-dark); letter-spacing: -0.01em;
+      margin-bottom: 6px;
+    }
+    #r-contacts {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 2px 12px; font-size: 9pt; color: var(--text-light);
+    }
+    #r-contacts .c-item {
+      display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+    }
+    #r-contacts .c-item i { font-size: 8.5pt; color: var(--text-mid); }
+    #r-contacts a { color: var(--text-dark); text-decoration: none; }
+    #r-contacts a:hover { text-decoration: underline; color: var(--accent); }
+    .c-sep { color: #ccc; font-size: 9pt; }
+
+    /* ─── SECTION ─────────────────────────────────────── */
+    .r-section { margin-top: 11px; }
+    .r-section-title {
+      font-size: 10.5pt; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-dark);
+      border-bottom: 2px solid var(--rule-color);
+      padding-bottom: 2px; margin-bottom: 6px;
+    }
+
+    /* ─── SUMMARY ─────────────────────────────────────── */
+    #r-summary-text { font-size: 9.5pt; color: var(--text-mid); line-height: 1.5; }
+
+    /* ─── EDUCATION ───────────────────────────────────── */
+    .edu-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      flex-wrap: wrap; margin-bottom: 1px;
+    }
+    .edu-inst { font-weight: 700; font-size: 10pt; color: var(--text-dark); }
+    .edu-year { font-size: 9pt; color: var(--text-light); }
+    .edu-degree { font-style: italic; font-size: 9.5pt; color: var(--text-mid); }
+    .edu-gpa { font-size: 9pt; color: var(--text-light); }
+
+    /* ─── SKILLS ──────────────────────────────────────── */
+    .skills-table { width: 100%; }
+    .skill-row { display: flex; margin-bottom: 3px; font-size: 9.5pt; }
+    .skill-label { font-weight: 700; min-width: 160px; color: var(--text-dark); }
+    .skill-val { color: var(--text-mid); }
+
+    /* ─── PROJECTS ────────────────────────────────────── */
+    .proj-item { margin-bottom: 8px; }
+    .proj-header {
+      display: flex; justify-content: space-between;
+      align-items: baseline; flex-wrap: wrap; margin-bottom: 2px;
+    }
+    .proj-title-tech { font-size: 9.5pt; }
+    .proj-name { font-weight: 700; color: var(--text-dark); }
+    .proj-tech { font-style: italic; color: var(--text-mid); }
+    .proj-links { display: flex; gap: 10px; font-size: 9pt; color: var(--text-light); }
+    .proj-links a {
+      color: var(--text-mid); text-decoration: none;
+      display: inline-flex; align-items: center; gap: 3px;
+    }
+    .proj-links a:hover { color: var(--accent); text-decoration: underline; }
+    .proj-bullets { padding-left: 18px; }
+    .proj-bullets li { font-size: 9pt; color: var(--text-mid); margin-bottom: 1px; }
+    .proj-bullets li::marker { color: var(--text-light); font-size: 8pt; }
+
+    /* ─── CERTIFICATIONS ──────────────────────────────── */
+    .cert-item {
+      display: flex; justify-content: space-between;
+      font-size: 9.5pt; margin-bottom: 3px;
+    }
+    .cert-name { font-weight: 700; color: var(--text-dark); }
+    .cert-issuer { color: var(--text-light); font-style: normal; }
+
+    /* ─── ACHIEVEMENTS ────────────────────────────────── */
+    .ach-item { font-size: 9.5pt; margin-bottom: 3px; }
+    .ach-title { font-weight: 700; color: var(--text-dark); }
+    .ach-sub { color: var(--text-mid); }
+
+    /* ─── LANGUAGES ───────────────────────────────────── */
+    .lang-list { font-size: 9.5pt; color: var(--text-mid); }
+    .lang-list strong { color: var(--text-dark); margin-right: 10px; }
+
+    /* ─── LAST UPDATED ────────────────────────────────── */
+    #r-footer {
+      margin-top: 18px; text-align: right;
+      font-size: 8pt; color: #aaa; font-style: italic;
+    }
+
+    /* ─── PRINT STYLES ────────────────────────────────── */
+    @media print {
+      body { background: #fff !important; }
+      #toolbar { display: none !important; }
+      #resume-page {
+        margin: 0 !important;
+        box-shadow: none !important;
+        padding: 28px 36px !important;
+        max-width: 100% !important;
+        font-size: 10pt;
+      }
+      #r-footer { display: none; }
+      a { color: inherit !important; }
+    }
+
+    /* ─── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 820px) {
+      #resume-page { margin: 62px 10px 30px; padding: 24px 18px 22px; }
+      #r-contacts { gap: 3px 8px; font-size: 8.5pt; }
+      #toolbar .t-title, #toolbar .t-badge { display: none; }
+      .skill-label { min-width: 120px; }
+    }
+    @media (max-width: 520px) {
+      #resume-page { padding: 18px 12px; font-size: 9.5pt; }
+      #r-name { font-size: 17pt; }
+      .edu-row, .proj-header, .cert-item { flex-direction: column; gap: 1px; }
+      .skill-row { flex-direction: column; }
+      .skill-label { min-width: unset; margin-bottom: 1px; }
+      #toolbar { padding: 0.5rem 1rem; }
+      .tb-btn { padding: 0.32rem 0.7rem; font-size: 0.77rem; }
+    }
+
+    /* ─── LOADING OVERLAY ─────────────────────────────── */
+    #r-loading {
+      text-align: center; padding: 60px 20px; color: #888;
+      font-size: 1rem;
+    }
+    .spinner {
+      display: inline-block; width: 32px; height: 32px;
+      border: 3px solid #dde; border-top-color: #2563eb;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ TOOLBAR ═══════════════════ -->
+<div id="toolbar">
+  <div class="t-left">
+    <a href="index.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Portfolio
+    </a>
+    <span class="t-title">Resume</span>
+    <span class="t-badge">AUTO-SYNC</span>
+  </div>
+  <div class="t-right">
+    <button class="tb-btn" id="btn-print" onclick="window.print()">
+      <i class="fas fa-print"></i> Print
+    </button>
+    <button class="tb-btn" id="btn-download" onclick="downloadPDF()">
+      <i class="fas fa-download"></i> Download PDF
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════ A4 RESUME PAGE ═══════════════════ -->
+<div id="resume-page">
+  <div id="r-loading">
+    <div class="spinner"></div><br>Loading resume data…
+  </div>
+  <!-- Content injected by JS below -->
+</div>
+
+<!-- ─── data.js (Single Source of Truth) ─── -->
+<script src="data.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   resume.html — Auto-Updating Resume
+   Reads from portfolioData (data.js)
+   Matches LaTeX template: Preet Sompura's resume
+   ═══════════════════════════════════════════════════════ */
+
+(function buildResume() {
+  const D = (typeof portfolioData !== 'undefined') ? portfolioData : null;
+
+  if (!D) {
+    document.getElementById('r-loading').innerHTML =
+      '<i class="fas fa-exclamation-triangle" style="color:#e74c3c;font-size:1.5rem;"></i>' +
+      '<br><span style="color:#e74c3c;font-weight:600;">Could not load data.js</span><br>' +
+      '<small style="color:#888;">Make sure data.js is in the same folder as resume.html</small>';
+    return;
+  }
+
+  /* ── helpers ── */
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const safe = s => esc(s || '');
+
+  /* ─── UPDATE PAGE TITLE ───────────────────── */
+  const name = D.hero?.name || 'Resume';
+  document.title = name + ' — Resume';
+
+  /* ─── SKILLS: restructure from data.js format ─── */
+  // data.js skills: [{category, items:[{name,pct}]}]
+  // LaTeX: Frontend, Backend & DB, AI/ML, Developer Tools, Programming
+  function getSkillCategories() {
+    if (!D.skills || !D.skills.length) return [];
+    return D.skills.map(cat => ({
+      label: cat.category,
+      items: (cat.items || []).map(i => i.name).join(', ')
+    }));
+  }
+
+  /* ─── PROJECTS: desc may be multi-sentence → split into bullets ─── */
+  function descToBullets(desc) {
+    if (!desc) return [];
+    // Split on '. ' keeping context; filter empties
+    const sentences = desc.split(/\.\s+/).map(s => s.trim()).filter(s => s.length > 5);
+    return sentences.map(s => s.endsWith('.') ? s : s + '.');
+  }
+
+  /* ─── BUILD HTML ─────────────────────────── */
+  const contact = D.contact || {};
+  const hero    = D.hero    || {};
+  const edu     = D.education     || [];
+  const projs   = D.projects      || [];
+  const certs   = D.certifications || [];
+  const ach     = D.achievements  || [];
+  const skills  = getSkillCategories();
+  const summary = hero.subtitle ? `3rd year ${hero.subtitle.replace('3rd Year B.Tech ', 'B.Tech ')} student with keen interest and practical exposure in AI, Machine Learning, and Web Development. Seeking a challenging internship position to apply acquired skills, work on creative projects, and contribute as a valuable team member.` : '';
+
+  /* -- contacts row -- */
+  const contacts = [];
+  if (contact.phone)    contacts.push(`<span class="c-item"><i class="fas fa-phone"></i> <span>${safe(contact.phone)}</span></span>`);
+  if (contact.email)    contacts.push(`<span class="c-item"><i class="fas fa-envelope"></i> <a href="mailto:${safe(contact.email)}">${safe(contact.email)}</a></span>`);
+  if (contact.linkedin) contacts.push(`<span class="c-item"><i class="fab fa-linkedin"></i> <a href="${safe(contact.linkedin)}" target="_blank">LinkedIn</a></span>`);
+  if (contact.github)   contacts.push(`<span class="c-item"><i class="fab fa-github"></i> <a href="${safe(contact.github)}" target="_blank">GitHub</a></span>`);
+  if (contact.leetcode) contacts.push(`<span class="c-item"><i class="fas fa-code"></i> <a href="${safe(contact.leetcode)}" target="_blank">LeetCode</a></span>`);
+
+  /* -- education rows -- */
+  const eduHTML = edu.map(e => `
+    <div style="margin-bottom:5px;">
+      <div class="edu-row">
+        <span class="edu-inst">${safe(e.institution)}</span>
+        <span class="edu-year">${safe(e.year)}</span>
+      </div>
+      <div class="edu-row">
+        <span class="edu-degree">${safe(e.degree)}</span>
+        <span class="edu-gpa">${safe(e.gpa)}</span>
+      </div>
+    </div>
+  `).join('');
+
+  /* -- skills rows -- */
+  const skillsHTML = skills.map(s => `
+    <div class="skill-row">
+      <span class="skill-label">${safe(s.label)}</span>
+      <span style="color:#555;margin:0 6px;">:</span>
+      <span class="skill-val">${safe(s.items)}</span>
+    </div>
+  `).join('');
+
+  /* -- projects -- */
+  const projsHTML = projs.map(p => {
+    const bullets = descToBullets(p.desc);
+    const tags    = (p.tags || []).join(', ');
+    const links   = [];
+    if (p.demoLink) links.push(`<a href="${safe(p.demoLink)}" target="_blank"><i class="fas fa-external-link-alt"></i> Live</a>`);
+    if (p.repoLink) links.push(`<a href="${safe(p.repoLink)}" target="_blank"><i class="fab fa-github"></i> GitHub</a>`);
+    return `
+      <div class="proj-item">
+        <div class="proj-header">
+          <div class="proj-title-tech">
+            <span class="proj-name">${safe(p.title)}</span>
+            ${tags ? ` &nbsp;|&nbsp; <span class="proj-tech"><em>${safe(tags)}</em></span>` : ''}
+          </div>
+          <div class="proj-links">${links.join('')}</div>
+        </div>
+        <ul class="proj-bullets">
+          ${bullets.map(b => `<li>${safe(b)}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }).join('');
+
+  /* -- certifications -- */
+  const certsHTML = certs.map(c => `
+    <div class="cert-item">
+      <span><span class="cert-name">${safe(c.name)}</span>
+      <span class="cert-issuer"> &nbsp;(${safe(c.issuer)})</span></span>
+    </div>
+  `).join('');
+
+  /* -- achievements -- */
+  const achHTML = ach.map(a => `
+    <div class="ach-item">
+      <span class="ach-title">${safe(a.title)}</span>
+      ${a.sub ? ` — <span class="ach-sub">${safe(a.sub)}</span>` : ''}
+    </div>
+  `).join('');
+
+  /* ─── INJECT INTO PAGE ───────────────────── */
+  document.getElementById('resume-page').innerHTML = `
+
+    <!-- HEADER -->
+    <div id="r-header">
+      <div id="r-name">${safe(name)}</div>
+      <div id="r-contacts">
+        ${contacts.join('<span class="c-sep">|</span>')}
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    ${summary ? `
+    <div class="r-section">
+      <div class="r-section-title">Summary</div>
+      <div id="r-summary-text">${safe(summary)}</div>
+    </div>` : ''}
+
+    <!-- EDUCATION -->
+    ${eduHTML ? `
+    <div class="r-section">
+      <div class="r-section-title">Education</div>
+      ${eduHTML}
+    </div>` : ''}
+
+    <!-- SKILLS -->
+    ${skillsHTML ? `
+    <div class="r-section">
+      <div class="r-section-title">Skills</div>
+      <div class="skills-table">${skillsHTML}</div>
+    </div>` : ''}
+
+    <!-- PROJECTS -->
+    ${projsHTML ? `
+    <div class="r-section">
+      <div class="r-section-title">Projects</div>
+      ${projsHTML}
+    </div>` : ''}
+
+    <!-- CERTIFICATIONS -->
+    ${certsHTML ? `
+    <div class="r-section">
+      <div class="r-section-title">Certifications</div>
+      ${certsHTML}
+    </div>` : ''}
+
+    <!-- ACHIEVEMENTS -->
+    ${achHTML ? `
+    <div class="r-section">
+      <div class="r-section-title">Achievements</div>
+      ${achHTML}
+    </div>` : ''}
+
+    <!-- LANGUAGES -->
+    <div class="r-section">
+      <div class="r-section-title">Languages</div>
+      <div class="lang-list">
+        <strong>Hindi</strong>
+        <strong>English</strong>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div id="r-footer">
+      Auto-generated from portfolio data · Last updated: ${new Date().toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}
+    </div>
+  `;
+})();
+
+/* ═══════════════════════════════════════════════════════
+   PDF DOWNLOAD via browser print (most reliable, no lib needed)
+   Uses a hidden iframe trick so only resume-page prints
+   ═══════════════════════════════════════════════════════ */
+function downloadPDF() {
+  // Show print dialog — user saves as PDF
+  // This is the most reliable method for a static site
+  const btn = document.getElementById('btn-download');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening…';
+  setTimeout(() => {
+    window.print();
+    btn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+  }, 200);
+}
+</script>
+</body>
+</html>
