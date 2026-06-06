@@ -126,13 +126,6 @@ const portfolioData = {
       ],
       "demoLink": "https://smartwardrobe-webapp.vercel.app/",
       "repoLink": "https://github.com/preetsompura127"
-    },
-    {
-      "title": "Protfolio",
-      "desc": "",
-      "tags": [],
-      "demoLink": "",
-      "repoLink": ""
     }
   ],
   "education": [
